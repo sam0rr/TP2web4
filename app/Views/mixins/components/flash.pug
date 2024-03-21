@@ -1,0 +1,18 @@
+mixin zf-flash()
+  -flash = pug_flash()
+  +__zf-flash-message(flash.success, 'success')
+  +__zf-flash-message(flash.error, 'danger')
+  +__zf-flash-message(flash.warning, 'warning')
+  +__zf-flash-message(flash.notice, 'notice')
+  +__zf-flash-message(flash.info, 'info')
+
+mixin __zf-flash-message(data, theme)
+  if data
+    .alert(class='alert-' + theme)
+      if is_array(data) && count(data) > 1
+        ul.mb-0
+          each message in data
+            if !empty(message)
+              li!=message
+      else
+        !=((is_array(data)) ? data[0] : data)
