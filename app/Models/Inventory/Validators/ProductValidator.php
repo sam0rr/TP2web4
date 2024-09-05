@@ -1,4 +1,4 @@
-<?php namespace Models\Organisation\Validators\Product;
+<?php namespace Models\Inventory\Validators;
 
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;

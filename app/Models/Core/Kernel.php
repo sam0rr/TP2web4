@@ -1,6 +1,7 @@
 <?php namespace Models\Core;
 
 use Dotenv\Dotenv;
+use Tracy\Debugger;
 use Zephyrus\Application\Configuration;
 use Zephyrus\Application\Flash;
 use Zephyrus\Exceptions\RouteMethodUnsupportedException;
@@ -24,6 +25,10 @@ class Kernel
     public function __construct()
     {
         $this->initializeEnvironnement();
+        if (Configuration::getApplication('env') == 'dev') {
+            Debugger::enable(Debugger::Development);
+            Debugger::$logDirectory = ROOT_DIR . '/temp';
+        }
         DatabaseSession::initiate(Configuration::getDatabase());
         $this->serverEnvironnement = new ServerEnvironnement($_SERVER);
         $this->request = new Request($this->serverEnvironnement);

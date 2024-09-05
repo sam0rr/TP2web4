@@ -5,27 +5,70 @@ Projet destiné à être utilisé comme base de gabarit pour les projets ZEPHYRU
 ## Environnement de développement (Docker)
 
 ### Prérequis
-Assurez-vous d'avoir Composer installer sur le poste de développement depuis Brew sur MacOs. Si Composer n'est pas
-installé, procéder à son installation avec la commande `brew install composer`. 
-
-Ensuite, assurez-vous d'avoir le [Moteur Docker](https://www.docker.com/products/docker-desktop/) installé et à jour.
-
-Finalement, vous aurez besoin de [Mutagen Compose](https://mutagen.io/documentation/orchestration/compose) qui s'assure que les fichiers sont correctement synchronisés pour optimiser la compilation de Pug. Si
-Mutagen Compose n'est pas installé, procéder à son installation avec la commande `brew install mutagen-io/mutagen/mutagen-compose`.
+Assurez-vous d'avoir le [Moteur Docker](https://www.docker.com/products/docker-desktop/) installé et à jour.
 
 ### Premier démarrage
-```sh
-composer install --ignore-platform-reqs
-mutagen-compose up
+Copiez le fichier `.env.docker` vers un fichier nommé `.env`. Ensuite, entrez votre jeton GitHub pour la variable d'environnement `GITHUB_ACCESS_TOKEN`.
+Lancez finalement la construction de l'environnement de développement.
+
+```shell
+docker compose up
+docker exec -it zephyrus_webserver composer install
 ```
 
 ### Mise à jour des dépendances (Composer)
-```sh
-composer update --ignore-platform-reqs
+```shell
+docker exec -it foundation_webserver composer update
 ```
 
 ### Redémarrer la base de données (au besoin)
-```sh
-mutagen-compose down
-mutagen-compose up
+```shell
+docker compose down
+docker compose up
+```
+
+### Activer / Désactiver Xdebug
+Par défaut, xdebug est installé, mais pas actif pour augmenter les performances en développement. Par contre, il est
+possible de l'activer et de le désactiver avec une commande. Doit être exécuté sur l'ordinateur hôte et non depuis le
+conteneur Docker (puisque le script interagit avec l'exécutable de Docker sur l'hôte).
+
+#### Activer
+```shell
+composer xdebug-enable
+```
+
+#### Désactiver
+```shell
+composer xdebug-disable
+```
+
+## MailCatcher
+
+Par défaut, l'image Docker fourni avec Zephyrus inclus [MailCatcher](https://www.google.com/search?client=safari&rls=en&q=mailcatcher&ie=UTF-8&oe=UTF-8). Ceci
+permet de tester des courriels simplement. 
+
+Pour accéder à MailCatcher : http://localhost:1080/  
+
+```yml
+mailer:
+  transport: "smtp"
+  from_address: "info@ophelios.com"
+  from_name: "Zephyrus"
+  smtp:
+    enabled: true
+    host: "localhost"
+    port: 1025
+    encryption: "none"
+    username: ""
+    password: ""
+```
+
+### Génération de la cache Latte
+```shell
+docker exec -it foundation_webserver composer latte-cache
+```
+
+### Supprimer les images Docker
+```shell
+docker rmi $(docker images -q)
 ```

@@ -1,45 +1,40 @@
-<?php namespace Models\Organisation\Services\Product;
+<?php namespace Models\Inventory\Services;
 
-use Models\Organisation\Brokers\Product\ProductBroker;
-use Models\Organisation\Validators\Product\ProductValidator;
-use stdClass;
+use Models\Inventory\Brokers\ProductBroker;
+use Models\Inventory\Entities\Product;
+use Models\Inventory\Validators\ProductValidator;
 use Zephyrus\Application\Form;
 
 class ProductService
 {
     public static function readAll(): array
     {
-        return (new ProductBroker())->findAll();
+        return Product::buildArray((new ProductBroker())->findAll());
     }
 
-    public static function read(int $productId): ?stdClass
+    public static function read(int $productId): ?Product
     {
-        return (new ProductBroker())->findById($productId);
+        return Product::build((new ProductBroker())->findById($productId));
     }
 
-    public static function insert(Form $form): stdClass
-    {
-        ProductValidator::assert($form);
-        $broker = new ProductBroker();
-        $productId = $broker->insert($form->buildObject());
-        return $broker->findById($productId);
-    }
-
-    public static function update(int $productId, Form $form): stdClass
+    public static function insert(Form $form): Product
     {
         ProductValidator::assert($form);
         $broker = new ProductBroker();
-        $broker->update($productId, $form->buildObject());
-        return $broker->findById($productId);
+        $productId = $broker->insert(Product::build($form->buildObject()));
+        return self::read($productId);
     }
 
-    public static function remove(int $productId): int
+    public static function update(Product $product, Form $form): Product
     {
-        return (new ProductBroker())->delete($productId);
+        ProductValidator::assert($form);
+        $broker = new ProductBroker();
+        $broker->update($product, Product::build($form->buildObject()));
+        return self::read($product->id);
     }
 
-    public static function removeAll(array $productIds): int
+    public static function remove(Product $old): int
     {
-        return (new ProductBroker())->deleteAll($productIds);
+        return (new ProductBroker())->delete($old);
     }
 }

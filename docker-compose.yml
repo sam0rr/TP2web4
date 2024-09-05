@@ -1,9 +1,9 @@
-version: "3.7"
-
 services:
   webserver:
     build:
       context: "./docker/services/php82"
+      args:
+        - GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
     container_name: "zephyrus_webserver"
     restart: 'always'
     ports:
@@ -13,14 +13,13 @@ services:
     links:
       - database
     volumes:
-      - code:/var/www/html
-      #- ./docker/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www/html
       - ./xdebug:/xdebug.d
 
   database:
     build:
       context: "./docker/services/postgres"
-    container_name: 'zephyrus_database'
+    container_name: ${DB_HOSTNAME}
     restart: 'always'
     ports:
       - "5432:5432"
@@ -29,29 +28,6 @@ services:
       - ./sql/init-database.sql:/docker-entrypoint-initdb.d/1-database.sql
       - ./sql/init-mocks.sql:/docker-entrypoint-initdb.d/2-data-mocks.sql
     environment:
-      POSTGRES_DB: 'zephyrus'
-      POSTGRES_USER: 'dev'
-      POSTGRES_PASSWORD: 'dev'
-
-volumes:
-  code:
-
-x-mutagen:
-  sync:
-    defaults:
-      mode: 'two-way-resolved'
-      ignore:
-        vcs: true
-        paths:
-          - '.idea'
-          - 'cache'
-
-    code:
-      alpha: '.'
-      beta: 'volume://code'
-      configurationBeta:
-        permissions:
-          defaultDirectoryMode: 0777
-          defaultFileMode: 0666
-          defaultOwner: 'id:33'
-          defaultGroup: 'id:33'
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}

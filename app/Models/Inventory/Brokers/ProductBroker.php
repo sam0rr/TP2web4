@@ -1,5 +1,6 @@
-<?php namespace Models\Organisation\Brokers\Product;
+<?php namespace Models\Inventory\Brokers;
 
+use Models\Inventory\Entities\Product;
 use stdClass;
 use Zephyrus\Database\DatabaseBroker;
 
@@ -15,7 +16,7 @@ class ProductBroker extends DatabaseBroker
         return $this->selectSingle("SELECT * FROM product WHERE product_id = ?", [$productId]);
     }
 
-    public function insert(stdClass $product): int
+    public function insert(Product $product): int
     {
         return $this->selectSingle("INSERT INTO product(provider, brand, name, price) 
                                                VALUES (?, ?, ?, ?) RETURNING product_id", [
@@ -26,32 +27,23 @@ class ProductBroker extends DatabaseBroker
         ])->product_id;
     }
 
-    public function update(int $productId, stdClass $product): int
+    public function update(Product $old, Product $new): int
     {
         $this->query("UPDATE product 
                                SET provider = ?, brand = ?, name = ?, price = ?
                              WHERE product_id = ?", [
-            $product->provider,
-            $product->brand,
-            $product->name,
-            $product->price,
-            $productId
+            $new->provider,
+            $new->brand,
+            $new->name,
+            $new->price,
+            $old->id
         ]);
         return $this->getLastAffectedCount();
     }
 
-    public function delete(int $productId): int
+    public function delete(Product $old): int
     {
-        $this->query("DELETE FROM product WHERE product_id = ?", [$productId]);
+        $this->query("DELETE FROM product WHERE product_id = ?", [$old->id]);
         return $this->getLastAffectedCount();
-    }
-
-    public function deleteAll(array $productIds): int
-    {
-        $deleted = 0;
-        foreach ($productIds as $productId) {
-            $deleted += $this->delete($productId);
-        }
-        return $deleted;
     }
 }

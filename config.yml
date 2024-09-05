@@ -16,8 +16,8 @@ locale:
 
 mailer:
   transport: "smtp"
-  from_address: "template@ophelios.com"
-  from_name: "Template"
+  from_address: "info@ophelios.com"
+  from_name: "Zephyrus"
   smtp:
     enabled: true
     host: "localhost"
@@ -34,23 +34,24 @@ database:
   search_paths:
     - public
 
+render:
+  engine: "latte"
+  cache_update: !php/const CACHE_UPDATE
+
 session:
   storage: "database"
+  table: "public.session"
   encrypted: false
   lifetime: 1440
 
 security:
   password:
     pepper: !php/const PASSWORD_PEPPER
-
   encryption:
     key: !php/const ENCRYPTION_KEY
-
-  confidentiality_key: !php/const CONFIDENTIALITY_KEY
-
   csrf:
     enabled: true
   ids:
-    enabled: false
+    enabled: true
     impact_threshold: 50
 
