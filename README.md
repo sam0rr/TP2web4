@@ -42,6 +42,17 @@ composer xdebug-enable
 composer xdebug-disable
 ```
 
+### Génération de la cache Latte
+```shell
+docker exec -it foundation_webserver composer latte-cache
+```
+
+### Supprimer les images Docker
+```shell
+docker rmi $(docker images -q)
+```
+
+
 ## MailCatcher
 
 Par défaut, l'image Docker fourni avec Zephyrus inclus [MailCatcher](https://www.google.com/search?client=safari&rls=en&q=mailcatcher&ie=UTF-8&oe=UTF-8). Ceci
@@ -61,14 +72,4 @@ mailer:
     encryption: "none"
     username: ""
     password: ""
-```
-
-### Génération de la cache Latte
-```shell
-docker exec -it foundation_webserver composer latte-cache
-```
-
-### Supprimer les images Docker
-```shell
-docker rmi $(docker images -q)
 ```
