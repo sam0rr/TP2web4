@@ -68,7 +68,6 @@ abstract class Controller extends BaseController
     protected function setupSecurityHeaders(SecureHeader $secureHeader): void
     {
         $csp = new ContentSecurityPolicy();
-        $csp->setDefaultSources(["'self'"]);
         $csp->setFontSources(["'self'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com']);
         $csp->setStyleSources(["'self'", 'https://fonts.googleapis.com', ContentSecurityPolicy::UNSAFE_INLINE]);
         $csp->setScriptSources(["'self'", 'https://ajax.googleapis.com', 'https://maps.googleapis.com',
