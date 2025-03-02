@@ -4,7 +4,7 @@ namespace Models\Domain\Entities;
 
 use Models\Core\Entity;
 
-class AuthToken extends Entity
+class Token extends Entity
 {
     public int $id;
     public int $userId;

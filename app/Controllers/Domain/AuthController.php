@@ -10,8 +10,6 @@ use Zephyrus\Network\Router\Post;
 
 class AuthController extends Controller
 {
-    //#[Post("/login")]     // Connexion avec retour du token (refresh du token)
-
     private AuthService $authService;
 
     public function __construct()
@@ -43,5 +41,23 @@ class AuthController extends Controller
         }
     }
 
+    #[Post("/login")]
+    public function login(): Response
+    {
+        $data = $this->request->getBody()->getParameters();
+
+        if (empty($data)) {
+            return $this->abortBadRequest("Aucune donnée envoyée.");
+        }
+
+        $form = new Form($data);
+        $result = $this->authService->authenticateUser($form);
+
+        if (isset($result["errors"])) {
+            return $this->json($result);
+        }
+
+        return $this->json($result);
+    }
 
 }
