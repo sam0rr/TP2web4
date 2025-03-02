@@ -3,40 +3,20 @@
 namespace Controllers\Domain;
 
 use Controllers\Controller;
-use Models\Domain\Services\UserProfileService;
+use Models\Domain\Services\AuthService;
 use Zephyrus\Application\Form;
-use Zephyrus\Exceptions\JsonParseException;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Post;
-use Zephyrus\Network\Router\Get;
-
-
-//john_doe92: KingReallyStrong123!
-//jane_smith88: SecurePassword2022!
-//alice_wonder77: WonderfulAlice23!
-//bob_builder65: Builder123@789Man!
-//charlie_brown54: CharlieSecure2022!
-//emma_watson43: EmmaHashPassword!
-//michael_scott32: MichaelStrong123!
-//sarah_connor21: Terminator2023@!
-//david_lee10: DavidEncrypt2023!
-//linda_kim99: LindaSecure2024!
 
 class AuthController extends Controller
 {
     //#[Post("/login")]     // Connexion avec retour du token (refresh du token)
 
-    private UserProfileService $userService;
+    private AuthService $authService;
 
     public function __construct()
     {
-        $this->userService = new UserProfileService();
-    }
-
-    public function before(): ?Response
-    {
-        // verifier si le token est bon.
-        return null;
+        $this->authService = new AuthService();
     }
 
     #[Post("/register")]
@@ -50,7 +30,7 @@ class AuthController extends Controller
             }
 
             $form = new Form($data);
-            $result = $this->userService->registerUser($form);
+            $result = $this->authService->registerUser($form);
 
             if (isset($result["error"])) {
                 return $this->abortBadRequest($result["error"]);
@@ -59,7 +39,7 @@ class AuthController extends Controller
             return $this->json($result);
         } catch (\Exception $e) {
             error_log($e->getMessage());
-            return $this->abortBadRequest("Une erreur est survenue: " . $e->getMessage());
+            return $this->abortBadRequest($e->getMessage());
         }
     }
 
