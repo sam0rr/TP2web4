@@ -1,6 +1,6 @@
 CREATE TABLE userProfiles (
                                id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                               userName TEXT NOT NULL UNIQUE,
+                               username TEXT NOT NULL UNIQUE,
                                firstname TEXT NOT NULL,
                                lastname TEXT NOT NULL,
                                email TEXT NOT NULL UNIQUE,

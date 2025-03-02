@@ -10,7 +10,7 @@ class UserProfileValidator
 {
     public static function assert(Form $form): void
     {
-        $form->field("userName", [
+        $form->field("username", [
             Rule::required("Username is required.")
         ]);
         $form->field("email", [
@@ -19,12 +19,12 @@ class UserProfileValidator
         ]);
         $form->field("password", [
             Rule::required("Password is required."),
-            Rule::length(8, "Password must be at least 8 characters.")
+            Rule::minLength(8, "Password must be at least 8 characters.")
         ]);
-        $form->field("firstName", [
+        $form->field("firstname", [
             Rule::required("First name is required.")
         ]);
-        $form->field("lastName", [
+        $form->field("lastname", [
             Rule::required("Last name is required.")
         ]);
 

@@ -42,27 +42,26 @@ class AuthController extends Controller
     #[Post("/register")]
     public function register(): Response
     {
+        try {
+            $data = $this->request->getBody()->getParameters();
 
-        $data = $this->request->getBody()->getParameters();
+            if (empty($data)) {
+                return $this->abortBadRequest("Aucune donnée envoyée ou format incorrect.");
+            }
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée ou format incorrect.");
+            $form = new Form($data);
+            $result = $this->userService->registerUser($form);
+
+            if (isset($result["error"])) {
+                return $this->abortBadRequest($result["error"]);
+            }
+
+            return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest("Une erreur est survenue: " . $e->getMessage());
         }
-
-        $form = new Form($data);
-        $result = $this->userService->registerUser($form);
-
-        if (isset($result["error"])) {
-            return $this->abortBadRequest($result["error"]);
-        }
-
-        return $this->json($result);
     }
 
-    #[Get("/patate")]
-    public function patate(): Response
-    {
-        return $this->json(["caca" => "lolipop"]);
-    }
 
 }
