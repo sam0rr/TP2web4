@@ -36,14 +36,6 @@ class TokenBroker extends DatabaseBroker
         return $this->mapToToken($row);
     }
 
-    public function revokeToken(int $userId): void
-    {
-        $this->rawQuery("
-            DELETE FROM authTokens WHERE userId = ?",
-            [$userId]
-        );
-    }
-
     private function mapToToken(object $row): Token
     {
         $token = new Token();

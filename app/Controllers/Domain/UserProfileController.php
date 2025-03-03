@@ -23,5 +23,23 @@ class UserProfileController extends Controller
         // verifier si le token est bon.
         return null;
     }
+    #[Get("/profile/{token}")]
+    public function login(): Response
+    {
+        $data = $this->request->getBody()->getParameters();
+
+        if (empty($data)) {
+            return $this->abortBadRequest("Aucune donnée envoyée.");
+        }
+
+        $form = new Form($data);
+        $result = $this->authService->authenticateUser($form);
+
+        if (isset($result["errors"])) {
+            return $this->json($result);
+        }
+
+        return $this->json($result);
+    }
 
 }
