@@ -51,19 +51,14 @@ class UserProfileService
             "userToken" => $tokenData->token
         ];
     }
-
     public function updateUserProfile(string $token, Form $form): array
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
 
-        if (!$tokenData) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 401];
-        }
-
         $userId = $tokenData->userId;
 
         $data = array_filter($form->getFields(), function ($value, $key) {
-            return !is_null($value) && $value !== "" && $key !== "password";
+            return !is_null($value) && $value !== "" && $key !== "password" && $key !== "type";
         }, ARRAY_FILTER_USE_BOTH);
 
         if (empty($data)) {
@@ -79,9 +74,7 @@ class UserProfileService
             ];
         }
 
-        if (isset($data['password'])) {
-            unset($data['password']);
-        }
+        unset($data['password'], $data['type']);
 
         $updatedUser = $this->userProfileBroker->updateUserProfile($userId, $data);
 
@@ -97,6 +90,70 @@ class UserProfileService
                 "email" => $updatedUser->email,
                 "firstname" => $updatedUser->firstname,
                 "lastname" => $updatedUser->lastname,
+                "type" => $updatedUser->type
+            ],
+            "status" => 200
+        ];
+    }
+
+    public function updatePassword(string $token, Form $form): array
+    {
+        try {
+            UserProfileValidator::assertPasswordUpdate($form);
+        } catch (FormException $e) {
+            return [
+                "errors" => array_values($e->getForm()->getErrorMessages()),
+                "status" => 400
+            ];
+        }
+
+        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
+
+        $user = $this->userProfileBroker->findById($tokenData->userId);
+
+        if (!$user) {
+            return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
+        }
+
+        $oldPassword = $form->getValue("old_password");
+        $newPassword = $form->getValue("new_password");
+
+        if (!Cryptography::verifyHashedPassword($oldPassword, $user->password)) {
+            return ["errors" => ["Ancien mot de passe incorrect."], "status" => 400];
+        }
+
+        $updatedUser = $this->userProfileBroker->updatePassword($user->id, $newPassword);
+
+        if (!$updatedUser) {
+            return ["errors" => ["Erreur lors de la mise à jour du mot de passe"], "status" => 500];
+        }
+
+        return [
+            "message" => "Mot de passe mis à jour avec succès",
+            "status" => 200
+        ];
+    }
+
+    public function elevateAccount(string $token): array
+    {
+        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
+
+        $user = $this->userProfileBroker->findById($tokenData->userId);
+
+        if (!$user) {
+            return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
+        }
+
+        if ($user->type === "PREMIUM") {
+            return ["errors" => ["L'utilisateur est déjà PREMIUM."], "status" => 400];
+        }
+
+        $updatedUser = $this->userProfileBroker->updateAccountType($user->id, "PREMIUM");
+
+        return [
+            "message" => "Compte mis à niveau vers PREMIUM avec succès",
+            "user" => [
+                "username" => $updatedUser->username,
                 "type" => $updatedUser->type
             ],
             "status" => 200

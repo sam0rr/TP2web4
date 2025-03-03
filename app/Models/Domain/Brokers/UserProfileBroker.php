@@ -4,6 +4,7 @@ namespace Models\Domain\Brokers;
 
 use Models\Domain\Entities\UserProfile;
 use Zephyrus\Database\DatabaseBroker;
+use Zephyrus\Security\Cryptography;
 
 class UserProfileBroker extends DatabaseBroker
 {
@@ -32,6 +33,35 @@ class UserProfileBroker extends DatabaseBroker
         return $row ? UserProfile::mapToUserProfile($row) : null;
     }
 
+    public function updatePassword(int $userId, string $newPassword): ?UserProfile
+    {
+        $hashedPassword = Cryptography::hashPassword($newPassword);
+
+        $this->rawQuery("
+        UPDATE userProfile
+        SET password = ?
+        WHERE id = ?",
+            [$hashedPassword, $userId]
+        );
+
+        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
+
+        return $row ? UserProfile::mapToUserProfile($row) : null;
+    }
+
+    public function updateAccountType(int $userId, string $newType): ?UserProfile
+    {
+        $this->rawQuery("
+        UPDATE userProfile 
+        SET type = ?
+        WHERE id = ?",
+            [$newType, $userId]
+        );
+        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
+
+        return $row ? UserProfile::mapToUserProfile($row) : null;
+    }
+
     public function findById(int $userId): ?UserProfile
     {
         $row = $this->selectSingle(
@@ -55,11 +85,4 @@ class UserProfileBroker extends DatabaseBroker
 
         return $row ? UserProfile::mapToUserProfile($row) : null;
     }
-
-
-
-
-
-
-
 }

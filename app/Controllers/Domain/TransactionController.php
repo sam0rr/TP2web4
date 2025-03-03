@@ -11,7 +11,7 @@ class TransactionController extends Controller
 {
 
     //#[Post("/profile/{token}/transactions")] // ajout d'une transaction
-    //#[Get("/profile/{token}/history")] // Voir l'historique des transactions
+    //#[Get("/profile/{token}/history")] // Voir l'historique des transactions d'un user
 
 
 
