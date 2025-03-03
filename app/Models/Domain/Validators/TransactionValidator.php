@@ -8,7 +8,7 @@ use Zephyrus\Application\Rule;
 
 class TransactionValidator
 {
-    public static function assertTransaction(Form $form): void
+    public static function assertTransaction(Form $form, string $userType): void
     {
         $form->field("item_name", [
             Rule::required("Le nom de l'article est obligatoire."),
@@ -26,6 +26,10 @@ class TransactionValidator
             Rule::integer("La quantité doit être un entier."),
             Rule::greaterThan(0, "La quantité doit être supérieure à zéro.")
         ]);
+
+        if ($userType === "NORMAL" && $form->getValue("price") > 30) {
+            $form->addError("price", "Les membres NORMAL ne peuvent pas acheter un article à plus de 30$.");
+        }
 
         if (!$form->verify()) {
             throw new FormException($form);

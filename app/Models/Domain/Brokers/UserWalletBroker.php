@@ -39,8 +39,8 @@ class UserWalletBroker extends DatabaseBroker
         $this->query("
             UPDATE userWallet
             SET balance = balance - ?
-            WHERE userId = ?",
-            [$amount, $userId]
+            WHERE userId = ? AND balance >= ?",
+            [$amount, $userId, $amount]
         );
 
         return $this->findByUserId($userId);
@@ -49,9 +49,9 @@ class UserWalletBroker extends DatabaseBroker
     public function updateTotalSpent(int $userId, float $amount): ?UserWallet
     {
         $this->query("
-        UPDATE userWallet 
-        SET totalSpent = totalSpent + ? 
-        WHERE userId = ?",
+            UPDATE userWallet 
+            SET totalSpent = totalSpent + ? 
+            WHERE userId = ?",
             [$amount, $userId]
         );
 
