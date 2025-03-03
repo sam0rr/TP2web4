@@ -9,7 +9,7 @@ class RegisterBroker extends DatabaseBroker
 {
     public function registerUser(UserProfile $user): UserProfile
     {
-        $this->rawQuery("
+        $this->selectSingle("
         INSERT INTO userProfile (username, firstname, lastname, email, password, type) 
         VALUES (?, ?, ?, ?, ?, 'NORMAL')", [
                 $user->username,
@@ -20,7 +20,12 @@ class RegisterBroker extends DatabaseBroker
             ]
         );
 
-        $user->id = (int) $this->getDatabase()->getLastInsertedId("userprofile_id_seq");
+        $user->id = (int) $this->getDatabase()->getLastInsertedId("userProfile_id_seq");
+
+        $this->selectSingle("
+        INSERT INTO userWallet (userId, balance, totalSpent) 
+        VALUES (?, 0, 0)", [$user->id]
+        );
 
         return $user;
     }

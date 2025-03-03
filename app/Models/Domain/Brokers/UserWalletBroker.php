@@ -2,7 +2,49 @@
 
 namespace Models\Domain\Brokers;
 
-class UserWalletBroker
-{
+use Models\Domain\Entities\UserWallet;
+use Zephyrus\Database\DatabaseBroker;
 
+class UserWalletBroker extends DatabaseBroker
+{
+    public function findOrCreateWallet(int $userId): UserWallet
+    {
+        $wallet = $this->findByUserId($userId);
+
+        if (!$wallet) {
+            $this->rawQuery("
+            INSERT INTO userWallet (userId, balance, totalSpent) 
+            VALUES (?, 0, 0)", [$userId]
+            );
+
+            $wallet = $this->findByUserId($userId);
+        }
+
+        return $wallet;
+    }
+
+    public function addFunds(int $userId, float $amount): UserWallet
+    {
+        $this->selectSingle("
+            UPDATE userWallet
+            SET balance = balance + ?
+            WHERE userId = ?",
+            [$amount, $userId]
+        );
+
+        return $this->findByUserId($userId);
+    }
+
+    public function findByUserId(int $userId): ?UserWallet
+    {
+        $row = $this->selectSingle("
+            SELECT userId, balance, totalSpent
+            FROM userWallet
+            WHERE userId = ?",
+            [$userId]
+        );
+
+        return $row ? UserWallet::mapToUserWallet($row) : null;
+    }
 }
+
