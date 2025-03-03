@@ -19,25 +19,6 @@ class UserProfileController extends Controller
         $this-> userProfileService = new UserProfileService();
     }
 
-    #[Post("/login")]
-    public function login(): Response
-    {
-        $data = $this->request->getBody()->getParameters();
-
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée.");
-        }
-
-        $form = new Form($data);
-        $result = $this->userProfileService->authenticateUser($form);
-
-        if (isset($result["errors"])) {
-            return $this->json($result);
-        }
-
-        return $this->json($result);
-    }
-
     #[Get("/profile/{token}")]
     public function getProfile(string $token): Response
     {

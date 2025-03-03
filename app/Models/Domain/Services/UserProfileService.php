@@ -20,37 +20,6 @@ class UserProfileService
         $this->tokenBroker = new userTokenBroker();
     }
 
-    public function authenticateUser(Form $form): array
-    {
-        try {
-            UserProfileValidator::assertLogin($form);
-        } catch (FormException $e) {
-            return [
-                "errors" => array_values($e->getForm()->getErrorMessages()),
-                "status" => 400
-            ];
-        }
-
-        $username = $form->getValue("username");
-        $password = $form->getValue("password");
-
-        $user = $this->userProfileBroker->findByUsername($username);
-
-        if (!$user) {
-            return ["errors" => ["Champs incorrects."], "status" => 401];
-        }
-
-        if (!Cryptography::verifyHashedPassword($password, $user->password)) {
-            return ["errors" => ["Mot de passe incorrect."], "status" => 401];
-        }
-
-        $tokenData = $this->tokenBroker->findValidTokenByUserId($user->id);
-
-        return [
-            "message" => "Connexion réussie",
-            "userToken" => $tokenData->token
-        ];
-    }
     public function updateUserProfile(string $token, Form $form): array
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
