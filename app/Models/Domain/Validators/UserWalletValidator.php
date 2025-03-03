@@ -22,7 +22,6 @@ class UserWalletValidator
         }
 
         $credit = (float) $form->getValue("credit");
-
         $maxCredit = ($userType === "PREMIUM") ? 2000.00 : 500.00;
 
         if ($credit > $maxCredit) {

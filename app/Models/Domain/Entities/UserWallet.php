@@ -16,6 +16,7 @@ class UserWallet extends Entity
         $wallet->userId = $row->userid;
         $wallet->balance = $row->balance;
         $wallet->totalSpent = $row->totalspent;
+
         return $wallet;
     }
 }

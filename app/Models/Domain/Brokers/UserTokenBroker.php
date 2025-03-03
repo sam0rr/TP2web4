@@ -7,60 +7,78 @@ use Models\Domain\Entities\UserToken;
 
 class UserTokenBroker extends DatabaseBroker
 {
-    public function save(UserToken $token): int
+    public function save(UserToken $token): ?UserToken
     {
-        $this->selectSingle("
-            INSERT INTO userToken (userId, token) 
-            VALUES (?, ?)", [
-                $token->userId,
-                $token->token
-            ]
-        );
+        $db = $this->getDatabase();
 
-        return (int) $this->getDatabase()->getLastInsertedId("usertoken_id_seq");
+        if (!is_int($token->userId) || empty($token->token)) {
+            return null;
+        }
+
+        $this->query("
+        INSERT INTO usertoken (userid, token, createdat) 
+        VALUES (?, ?, NOW())", [
+            $token->userId,
+            $token->token
+        ]);
+
+        $token->id = $db->getLastInsertedId("usertoken_id_seq");
+
+        if (!$token->id) {
+            return null;
+        }
+
+        return $this->findTokenById($token->id);
     }
 
     public function findValidTokenByValue(string $tokenValue): ?UserToken
     {
         $row = $this->selectSingle("
-        SELECT id, userId, token, createdAt
-        FROM userToken
-        WHERE token = ?
+        SELECT id, userid, token, createdat
+        FROM usertoken
+        WHERE token = ? 
         LIMIT 1",
             [$tokenValue]
         );
 
-        if (!$row) {
-            return null;
-        }
-
-        return UserToken::mapToToken($row);
+        return $row ? UserToken::mapToToken($row) : null;
     }
 
-    public function findValidTokenByUserId(int $userId): ?userToken
+    public function findValidTokenByUserId(int $userId): ?UserToken
     {
         $row = $this->selectSingle("
-        SELECT id, userId, token, createdAt
-        FROM userToken
-        WHERE userId = ?
-        ORDER BY createdAt DESC
+        SELECT id, userid, token, createdat
+        FROM usertoken
+        WHERE userid = ?
+        ORDER BY createdat DESC
         LIMIT 1",
             [$userId]
         );
 
-        return $row ? userToken::mapToToken($row) : null;
+        return $row ? UserToken::mapToToken($row) : null;
     }
 
-    public function revokeToken(string $tokenValue): bool
+    public function findTokenById(int $id): ?UserToken
     {
-        $tokenData = $this->findValidTokenByValue($tokenValue);
+        $row = $this->selectSingle("
+        SELECT id, userid, token, createdat
+        FROM usertoken
+        WHERE id = ?
+        LIMIT 1",
+            [$id]
+        );
 
-        if (!$tokenData) {
+        return $row ? UserToken::mapToToken($row) : null;
+    }
+
+    public function revokeToken(int $id): bool
+    {
+        try {
+            $this->query("DELETE FROM usertoken WHERE id = ?", [$id]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("Failed to revoke token ID $id: " . $e->getMessage());
             return false;
         }
-
-        $this->selectSingle("DELETE FROM userToken WHERE token = ?", [$tokenValue]);
-
-        return true;
     }
 }

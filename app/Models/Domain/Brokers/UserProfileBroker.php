@@ -8,6 +8,8 @@ use Zephyrus\Security\Cryptography;
 
 class UserProfileBroker extends DatabaseBroker
 {
+    private array $allowedFields = ['username', 'firstname', 'lastname', 'email'];
+
     public function updateUserProfile(int $userId, array $data): ?UserProfile
     {
         if (empty($data)) {
@@ -18,58 +20,58 @@ class UserProfileBroker extends DatabaseBroker
         $values = [];
 
         foreach ($data as $key => $value) {
+            if (!in_array($key, $this->allowedFields, true)) {
+                continue;
+            }
             $setClauses[] = "$key = ?";
             $values[] = $value;
+        }
+
+        if (empty($setClauses)) {
+            return null;
         }
 
         $values[] = $userId;
 
         $sql = "UPDATE userProfile SET " . implode(", ", $setClauses) . " WHERE id = ?";
+        $this->query($sql, $values);
 
-        $this->rawQuery($sql, $values);
-
-        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
-
-        return $row ? UserProfile::mapToUserProfile($row) : null;
+        return $this->findById($userId);
     }
 
     public function updatePassword(int $userId, string $newPassword): ?UserProfile
     {
         $hashedPassword = Cryptography::hashPassword($newPassword);
 
-        $this->rawQuery("
+        $this->query("
         UPDATE userProfile
         SET password = ?
-        WHERE id = ?",
-            [$hashedPassword, $userId]
-        );
+        WHERE id = ?", [$hashedPassword, $userId]);
 
-        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
-
-        return $row ? UserProfile::mapToUserProfile($row) : null;
+        return $this->findById($userId);
     }
 
     public function updateAccountType(int $userId, string $newType): ?UserProfile
     {
-        $this->rawQuery("
+        $allowedTypes = ['NORMAL', 'PREMIUM'];
+        if (!in_array($newType, $allowedTypes, true)) {
+            return null;
+        }
+
+        $this->query("
         UPDATE userProfile 
         SET type = ?
-        WHERE id = ?",
-            [$newType, $userId]
-        );
-        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
+        WHERE id = ?", [$newType, $userId]);
 
-        return $row ? UserProfile::mapToUserProfile($row) : null;
+        return $this->findById($userId);
     }
 
     public function findById(int $userId): ?UserProfile
     {
         $row = $this->selectSingle(
             "SELECT id, username, firstname, lastname, email, password, type 
-        FROM userProfile
-        WHERE id = ?",
-            [$userId]
-        );
+            FROM userProfile
+            WHERE id = ?", [$userId]);
 
         return $row ? UserProfile::mapToUserProfile($row) : null;
     }

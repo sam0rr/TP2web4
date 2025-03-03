@@ -23,19 +23,12 @@ class RegisterService
     public function registerUser(Form $form): array
     {
         try {
-            RegisterValidator::assertRegister($form);
+            RegisterValidator::assertRegister($form, $this->broker);
         } catch (FormException $e) {
             return [
                 "errors" => array_values($e->getForm()->getErrorMessages()),
                 "status" => 400
             ];
-        }
-
-        if ($this->broker->usernameExists($form->getValue('username'))) {
-            return ["errors" => ["Username utilisé"], "status" => 400];
-        }
-        if ($this->broker->emailExists($form->getValue('email'))) {
-            return ["errors" => ["Email utilisé"], "status" => 400];
         }
 
         $hashedPassword = Cryptography::hashPassword($form->getValue('password'));
@@ -49,7 +42,6 @@ class RegisterService
         $user->type = 'NORMAL';
 
         $user = $this->broker->registerUser($user);
-
         $token = $this->userTokenService->createToken($user);
 
         return [

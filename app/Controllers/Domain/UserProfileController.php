@@ -6,7 +6,6 @@ use Controllers\Controller;
 use Models\Domain\Services\UserProfileService;
 use Zephyrus\Application\Form;
 use Zephyrus\Network\Response;
-use Zephyrus\Network\Router\Post;
 use Zephyrus\Network\Router\Get;
 use Zephyrus\Network\Router\Put;
 

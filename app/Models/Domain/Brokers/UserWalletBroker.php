@@ -12,10 +12,9 @@ class UserWalletBroker extends DatabaseBroker
         $wallet = $this->findByUserId($userId);
 
         if (!$wallet) {
-            $this->rawQuery("
+            $this->query("
             INSERT INTO userWallet (userId, balance, totalSpent) 
-            VALUES (?, 0, 0)", [$userId]
-            );
+            VALUES (?, 0, 0)", [$userId]);
 
             $wallet = $this->findByUserId($userId);
         }
@@ -23,9 +22,9 @@ class UserWalletBroker extends DatabaseBroker
         return $wallet;
     }
 
-    public function addFunds(int $userId, float $amount): UserWallet
+    public function addFunds(int $userId, float $amount): ?UserWallet
     {
-        $this->selectSingle("
+        $this->query("
             UPDATE userWallet
             SET balance = balance + ?
             WHERE userId = ?",
@@ -35,9 +34,9 @@ class UserWalletBroker extends DatabaseBroker
         return $this->findByUserId($userId);
     }
 
-    public function withdrawFunds(int $userId, float $amount): UserWallet
+    public function withdrawFunds(int $userId, float $amount): ?UserWallet
     {
-        $this->selectSingle("
+        $this->query("
             UPDATE userWallet
             SET balance = balance - ?
             WHERE userId = ?",
@@ -59,4 +58,3 @@ class UserWalletBroker extends DatabaseBroker
         return $row ? UserWallet::mapToUserWallet($row) : null;
     }
 }
-

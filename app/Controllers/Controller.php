@@ -11,6 +11,7 @@ abstract class Controller extends BaseController
 {
     private ?UserTokenService $tokenService = null;
     protected ?UserToken $authenticatedUserToken = null;
+    protected ?string $originalToken = null;
 
     public function before(): ?Response
     {
@@ -18,13 +19,13 @@ abstract class Controller extends BaseController
             $this->tokenService = new UserTokenService();
         }
 
-        $token = $this->request->getArgument("token");
+        $this->originalToken = $this->request->getArgument("token");
 
-        if (!$token) {
+        if (!$this->originalToken) {
             return $this->abortUnauthorized("Token manquant.");
         }
 
-        $this->authenticatedUserToken = $this->renewUserToken($token);
+        $this->authenticatedUserToken = $this->tokenService->validateToken($this->originalToken);
 
         if (!$this->authenticatedUserToken) {
             return $this->abortUnauthorized("Token invalide ou expiré.");
@@ -33,9 +34,12 @@ abstract class Controller extends BaseController
         return parent::before();
     }
 
-    private function renewUserToken(string $tokenValue): ?UserToken
+    public function after(?Response $response): ?Response
     {
-        $userToken = $this->tokenService->renewUserToken($tokenValue);
-        return $userToken ? UserToken::mapToToken($userToken) : null;
+        if ($this->authenticatedUserToken) {
+            $this->tokenService->renewUserTokenByTokenValue($this->originalToken);
+        }
+
+        return parent::after($response);
     }
 }

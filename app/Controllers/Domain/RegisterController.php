@@ -10,11 +10,11 @@ use Zephyrus\Application\Controller as BaseController;
 
 class RegisterController extends BaseController
 {
-    private RegisterService $authService;
+    private RegisterService $registerService;
 
     public function __construct()
     {
-        $this->authService = new RegisterService();
+        $this->registerService = new RegisterService();
     }
 
     #[Post("/register")]
@@ -28,7 +28,7 @@ class RegisterController extends BaseController
             }
 
             $form = new Form($data);
-            $result = $this->authService->registerUser($form);
+            $result = $this->registerService->registerUser($form);
 
             if (isset($result["error"])) {
                 return $this->abortBadRequest($result["error"]);

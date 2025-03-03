@@ -3,7 +3,7 @@
 namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\UserProfileBroker;
-use Models\Domain\Brokers\userTokenBroker;
+use Models\Domain\Brokers\UserTokenBroker;
 use Models\Domain\Validators\UserProfileValidator;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
@@ -12,19 +12,20 @@ use Zephyrus\Security\Cryptography;
 class UserProfileService
 {
     private UserProfileBroker $userProfileBroker;
-    private userTokenBroker $tokenBroker;
+    private UserTokenBroker $tokenBroker;
 
     public function __construct()
     {
         $this->userProfileBroker = new UserProfileBroker();
-        $this->tokenBroker = new userTokenBroker();
+        $this->tokenBroker = new UserTokenBroker();
     }
 
     public function updateUserProfile(string $token, Form $form): array
     {
-        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
-
-        $userId = $tokenData->userId;
+        $userId = $this->getUserIdFromToken($token);
+        if (!$userId) {
+            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
+        }
 
         $data = array_filter($form->getFields(), function ($value, $key) {
             return !is_null($value) && $value !== "" && $key !== "password" && $key !== "type";
@@ -37,13 +38,8 @@ class UserProfileService
         try {
             UserProfileValidator::assertUpdate(new Form($data));
         } catch (FormException $e) {
-            return [
-                "errors" => array_values($e->getForm()->getErrorMessages()),
-                "status" => 400
-            ];
+            return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
         }
-
-        unset($data['password'], $data['type']);
 
         $updatedUser = $this->userProfileBroker->updateUserProfile($userId, $data);
 
@@ -67,19 +63,18 @@ class UserProfileService
 
     public function updatePassword(string $token, Form $form): array
     {
+        $userId = $this->getUserIdFromToken($token);
+        if (!$userId) {
+            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
+        }
+
         try {
             UserProfileValidator::assertPasswordUpdate($form);
         } catch (FormException $e) {
-            return [
-                "errors" => array_values($e->getForm()->getErrorMessages()),
-                "status" => 400
-            ];
+            return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
         }
 
-        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
-
-        $user = $this->userProfileBroker->findById($tokenData->userId);
-
+        $user = $this->userProfileBroker->findById($userId);
         if (!$user) {
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
@@ -91,24 +86,23 @@ class UserProfileService
             return ["errors" => ["Ancien mot de passe incorrect."], "status" => 400];
         }
 
-        $updatedUser = $this->userProfileBroker->updatePassword($user->id, $newPassword);
+        $updatedUser = $this->userProfileBroker->updatePassword($userId, $newPassword);
 
         if (!$updatedUser) {
             return ["errors" => ["Erreur lors de la mise à jour du mot de passe"], "status" => 500];
         }
 
-        return [
-            "message" => "Mot de passe mis à jour avec succès",
-            "status" => 200
-        ];
+        return ["message" => "Mot de passe mis à jour avec succès", "status" => 200];
     }
 
     public function elevateAccount(string $token): array
     {
-        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
+        $userId = $this->getUserIdFromToken($token);
+        if (!$userId) {
+            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
+        }
 
-        $user = $this->userProfileBroker->findById($tokenData->userId);
-
+        $user = $this->userProfileBroker->findById($userId);
         if (!$user) {
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
@@ -117,7 +111,10 @@ class UserProfileService
             return ["errors" => ["L'utilisateur est déjà PREMIUM."], "status" => 400];
         }
 
-        $updatedUser = $this->userProfileBroker->updateAccountType($user->id, "PREMIUM");
+        $updatedUser = $this->userProfileBroker->updateAccountType($userId, "PREMIUM");
+        if (!$updatedUser) {
+            return ["errors" => ["Échec de l'élévation du compte"], "status" => 500];
+        }
 
         return [
             "message" => "Compte mis à niveau vers PREMIUM avec succès",
@@ -131,14 +128,12 @@ class UserProfileService
 
     public function getUserProfile(string $token): array
     {
-        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
-
-        if (!$tokenData) {
-            return ["errors" => ["Token invalide"], "status" => 401];
+        $userId = $this->getUserIdFromToken($token);
+        if (!$userId) {
+            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
         }
 
-        $user = $this->userProfileBroker->findById($tokenData->userId);
-
+        $user = $this->userProfileBroker->findById($userId);
         if (!$user) {
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
@@ -151,5 +146,11 @@ class UserProfileService
             "lastname" => $user->lastname,
             "type" => $user->type
         ];
+    }
+
+    private function getUserIdFromToken(string $token): ?int
+    {
+        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
+        return $tokenData?->userId;
     }
 }

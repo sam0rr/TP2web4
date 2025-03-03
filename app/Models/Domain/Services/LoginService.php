@@ -3,7 +3,6 @@
 namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\LoginBroker;
-use Models\Domain\Brokers\UserTokenBroker;
 use Models\Domain\Validators\LoginValidator;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
@@ -12,12 +11,12 @@ use Zephyrus\Security\Cryptography;
 class LoginService
 {
     private LoginBroker $loginBroker;
-    private userTokenBroker $tokenBroker;
+    private ?UserTokenService $tokenService;
 
     public function __construct()
     {
         $this->loginBroker = new LoginBroker();
-        $this->tokenBroker = new userTokenBroker();
+        $this->tokenService = new UserTokenService();
     }
 
     public function authenticateUser(Form $form): array
@@ -35,6 +34,9 @@ class LoginService
         $password = $form->getValue("password");
 
         $user = $this->loginBroker->findByUsername($username);
+        if (!$user) {
+            return ["errors" => ["Utilisateur incorrect"], "status" => 403];
+        }
 
         if (!$user) {
             return ["errors" => ["Champs incorrects."], "status" => 401];
@@ -44,11 +46,12 @@ class LoginService
             return ["errors" => ["Mot de passe incorrect."], "status" => 401];
         }
 
-        $tokenData = $this->tokenBroker->findValidTokenByUserId($user->id);
+        $newToken = $this->tokenService->renewUserTokenByUserId($user->id);
 
         return [
             "message" => "Connexion réussie",
-            "userToken" => $tokenData->token
+            "userToken" => $newToken->token
         ];
     }
+
 }

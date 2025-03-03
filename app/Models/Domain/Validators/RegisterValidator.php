@@ -2,13 +2,14 @@
 
 namespace Models\Domain\Validators;
 
+use Models\Domain\Brokers\RegisterBroker;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
 use Zephyrus\Application\Rule;
 
 class RegisterValidator
 {
-    public static function assertRegister(Form $form): void
+    public static function assertRegister(Form $form, RegisterBroker $broker): void
     {
         $form->field("username", [
             Rule::required("Le nom d'utilisateur est obligatoire.")
@@ -27,6 +28,13 @@ class RegisterValidator
         $form->field("lastname", [
             Rule::required("Le nom de famille est obligatoire.")
         ]);
+
+        if ($broker->usernameExists($form->getValue('username'))) {
+            $form->addError("username", "Nom d'utilisateur déjà utilisé.");
+        }
+        if ($broker->emailExists($form->getValue('email'))) {
+            $form->addError("email", "Email déjà utilisé.");
+        }
 
         if (!$form->verify()) {
             throw new FormException($form);
