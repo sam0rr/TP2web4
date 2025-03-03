@@ -8,4 +8,5 @@ class UserWallet extends Entity
 {
     public int $userId;
     public float $balance;
+    public float $totalSpent;
 }

@@ -13,10 +13,5 @@ class UserWalletController extends Controller
    // #[Post("/profile/{token}/credits")]     // Ajouter des fonds au portefeuille
     ////#[Post("/profile/{token}/withdraw")]    // Retirer de l’argent du portefeuille
 
-    public function before(): ?Response
-    {
-        // verifier si le token est bon.
-        return null;
-    }
 
 }

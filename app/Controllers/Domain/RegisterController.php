@@ -2,19 +2,19 @@
 
 namespace Controllers\Domain;
 
-use Controllers\Controller;
-use Models\Domain\Services\AuthService;
+use Models\Domain\Services\RegisterService;
 use Zephyrus\Application\Form;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Post;
+use Zephyrus\Application\Controller as BaseController;
 
-class AuthController extends Controller
+class RegisterController extends BaseController
 {
-    private AuthService $authService;
+    private RegisterService $authService;
 
     public function __construct()
     {
-        $this->authService = new AuthService();
+        $this->authService = new RegisterService();
     }
 
     #[Post("/register")]
@@ -39,25 +39,6 @@ class AuthController extends Controller
             error_log($e->getMessage());
             return $this->abortBadRequest($e->getMessage());
         }
-    }
-
-    #[Post("/login")]
-    public function login(): Response
-    {
-        $data = $this->request->getBody()->getParameters();
-
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée.");
-        }
-
-        $form = new Form($data);
-        $result = $this->authService->authenticateUser($form);
-
-        if (isset($result["errors"])) {
-            return $this->json($result);
-        }
-
-        return $this->json($result);
     }
 
 }

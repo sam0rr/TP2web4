@@ -7,23 +7,22 @@ use Models\Domain\Services\UserProfileService;
 use Zephyrus\Application\Form;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Post;
-use Zephyrus\Network\Router\Put;
 use Zephyrus\Network\Router\Get;
+use Zephyrus\Network\Router\Put;
 
 class UserProfileController extends Controller
 {
-
-    //#[Get("/profile/{token}")]       // Récupérer les infos d'un utilisateur
-    //#[Put("/profile/{token}")]     // Mettre à jour les infos (email, username, etc.)
-    //#[Put("/profile/{token}/password")]   // Changer le mot de pass
+    //#[Put("/profile/{token}/password")]   // Changer le mot de passe
     //#[Post("/profile/elevate")]   // Normal -> premium
 
-    public function before(): ?Response
+    private UserProfileService $userProfileService;
+
+    public function __construct()
     {
-        // verifier si le token est bon.
-        return null;
+        $this-> userProfileService = new UserProfileService();
     }
-    #[Get("/profile/{token}")]
+
+    #[Post("/login")]
     public function login(): Response
     {
         $data = $this->request->getBody()->getParameters();
@@ -33,7 +32,38 @@ class UserProfileController extends Controller
         }
 
         $form = new Form($data);
-        $result = $this->authService->authenticateUser($form);
+        $result = $this->userProfileService->authenticateUser($form);
+
+        if (isset($result["errors"])) {
+            return $this->json($result);
+        }
+
+        return $this->json($result);
+    }
+
+    #[Get("/profile/{token}")]
+    public function getProfile(string $token): Response
+    {
+        $result = $this->userProfileService->getUserProfile($token);
+
+        if (isset($result["errors"])) {
+            return $this->json($result);
+        }
+
+        return $this->json($result);
+    }
+
+    #[Put("/profile/{token}")]
+    public function updateProfile(string $token): Response
+    {
+        $data = $this->request->getBody()->getParameters();
+
+        if (empty($data)) {
+            return $this->abortBadRequest("Aucune donnée envoyée.");
+        }
+
+        $form = new Form($data);
+        $result = $this->userProfileService->updateUserProfile($token, $form);
 
         if (isset($result["errors"])) {
             return $this->json($result);

@@ -9,42 +9,44 @@ class TokenBroker extends DatabaseBroker
 {
     public function save(Token $token): int
     {
-        $this->rawQuery("
-            INSERT INTO authTokens (userId, token, createdAt, expiresAt) 
-            VALUES (?, ?, ?, ?)",
-            [$token->userId, $token->token, $token->createdAt, $token->expiresAt]
+        $this->selectSingle("
+            INSERT INTO authTokens (userId, token) 
+            VALUES (?, ?)", [
+                $token->userId,
+                $token->token
+            ]
         );
 
         return (int) $this->getDatabase()->getLastInsertedId("authTokens_id_seq");
     }
 
-    public function findValidToken(int $userId): ?Token
+    public function findValidTokenByValue(string $tokenValue): ?Token
     {
         $row = $this->selectSingle("
-            SELECT id, userId, token, createdAt, expiresAt 
-            FROM authTokens
-            WHERE userId = ? AND expiresAt > NOW() 
-            ORDER BY createdAt DESC 
-            LIMIT 1",
-            [$userId]
+        SELECT id, userId, token, createdAt
+        FROM authTokens
+        WHERE token = ?
+        LIMIT 1",
+            [$tokenValue]
         );
 
         if (!$row) {
             return null;
         }
 
-        return $this->mapToToken($row);
+        return Token::mapToToken($row);
     }
 
-    private function mapToToken(object $row): Token
+    public function revokeToken(string $tokenValue): bool
     {
-        $token = new Token();
-        $token->id = $row->id;
-        $token->userId = $row->userId;
-        $token->token = $row->token;
-        $token->createdAt = $row->createdAt;
-        $token->expiresAt = $row->expiresAt;
+        $tokenData = $this->findValidTokenByValue($tokenValue);
 
-        return $token;
+        if (!$tokenData) {
+            return false;
+        }
+
+        $this->selectSingle("DELETE FROM authTokens WHERE token = ?", [$tokenValue]);
+
+        return true;
     }
 }

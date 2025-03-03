@@ -13,4 +13,18 @@ class UserProfile extends Entity
     public string $email;
     public string $password;
     public string $type;
+
+    public static function mapToUserProfile(object $row): UserProfile
+    {
+        $user = new UserProfile();
+        $user->id = $row->id;
+        $user->username = $row->username;
+        $user->firstname = $row->firstname;
+        $user->lastname = $row->lastname;
+        $user->email = $row->email;
+        $user->password = $row->password;
+        $user->type = $row->type;
+
+        return $user;
+    }
 }

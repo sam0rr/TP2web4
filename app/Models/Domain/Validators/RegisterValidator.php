@@ -6,9 +6,9 @@ use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
 use Zephyrus\Application\Rule;
 
-class AuthValidator
+class RegisterValidator
 {
-    public static function assert(Form $form): void
+    public static function assertRegister(Form $form): void
     {
         $form->field("username", [
             Rule::required("Le nom d'utilisateur est obligatoire.")
@@ -26,20 +26,6 @@ class AuthValidator
         ]);
         $form->field("lastname", [
             Rule::required("Le nom de famille est obligatoire.")
-        ]);
-
-        if (!$form->verify()) {
-            throw new FormException($form);
-        }
-    }
-
-    public static function assertLogin(Form $form): void
-    {
-        $form->field("username", [
-            Rule::required("Le nom d'utilisateur est obligatoire.")
-        ]);
-        $form->field("password", [
-            Rule::required("Le mot de passe est obligatoire.")
         ]);
 
         if (!$form->verify()) {

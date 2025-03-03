@@ -10,29 +10,29 @@ INSERT INTO userProfiles (username, firstname, lastname, email, password, type) 
                                                                                                 ('david_lee10', 'David', 'Leeman', 'david.lee10@example.com', '$2y$12$RGF2aWRFbmNyeXB0MjAyMyEHs9KjX2mP5vR8tY0zN3qW6cA9gJ', 'NORMAL'),
                                                                                                 ('linda_kim99', 'Linda', 'Kimberly', 'linda.kim99@example.com', '$2y$12$TGlubmFTZWN1cmUyMDI0IQMz6KjL9vR2tY5zA8qN0uW3cF6gB', 'PREMIUM');
 
-INSERT INTO authTokens (userId, token, expiresAt) VALUES
-                                                         (1, 'jwt_john_doe92_8f3k9p2m7v4r1t6', '2025-12-31 23:59:59'),
-                                                         (2, 'jwt_jane_smith88_5x8y1a4c7e9g2', '2025-12-31 23:59:59'),
-                                                         (3, 'jwt_alice_wonder77_2j5k8m3p6r9t', '2025-12-31 23:59:59'),
-                                                         (4, 'jwt_bob_builder65_9v2x5y8a1c4e', '2025-12-31 23:59:59'),
-                                                         (5, 'jwt_charlie_brown54_6t9r2p5m8k', '2025-12-31 23:59:59'),
-                                                         (6, 'jwt_emma_watson43_3e6g9j2k5m8', '2025-12-31 23:59:59'),
-                                                         (7, 'jwt_michael_scott32_1c4e7g9j2k', '2025-12-31 23:59:59'),
-                                                         (8, 'jwt_sarah_connor21_8m3p6r9t2v5', '2025-12-31 23:59:59'),
-                                                         (9, 'jwt_david_lee10_5y8a1c4e7g9j', '2025-12-31 23:59:59'),
-                                                         (10, 'jwt_linda_kim99_2k5m8p3r6t9v', '2025-12-31 23:59:59');
+INSERT INTO authTokens (userId, token) VALUES
+                                                         (1, 'jwt_john_doe92_8f3k9p2m7v4r1t6'),
+                                                         (2, 'jwt_jane_smith88_5x8y1a4c7e9g2'),
+                                                         (3, 'jwt_alice_wonder77_2j5k8m3p6r9t'),
+                                                         (4, 'jwt_bob_builder65_9v2x5y8a1c4e'),
+                                                         (5, 'jwt_charlie_brown54_6t9r2p5m8k'),
+                                                         (6, 'jwt_emma_watson43_3e6g9j2k5m8'),
+                                                         (7, 'jwt_michael_scott32_1c4e7g9j2k'),
+                                                         (8, 'jwt_sarah_connor21_8m3p6r9t2v5'),
+                                                         (9, 'jwt_david_lee10_5y8a1c4e7g9j'),
+                                                         (10, 'jwt_linda_kim99_2k5m8p3r6t9v');
 
-INSERT INTO userWallets (userId, balance) VALUES
-                                                (1, 150.75),
-                                                (2, 750.00),
-                                                (3, 320.50),
-                                                (4, 80.25),
-                                                (5, 1250.00),
-                                                (6, 450.80),
-                                                (7, 95.60),
-                                                (8, 1800.90),
-                                                (9, 275.30),
-                                                (10, 990.15);
+INSERT INTO userWallets (userId, balance, totalspent) VALUES
+                                                (1, 150.75, 1000),
+                                                (2, 750.00, 1000),
+                                                (3, 320.50, 2300),
+                                                (4, 80.25, 5000),
+                                                (5, 1250.00, 300),
+                                                (6, 450.80, 500),
+                                                (7, 95.60, 50),
+                                                (8, 1800.90, 80),
+                                                (9, 275.30, 50),
+                                                (10, 990.15, 2003);
 
 INSERT INTO transactions (userId, itemName, price, quantity) VALUES
                                                                    (1, 'Gaming Laptop', 1499.99, 1),
@@ -64,15 +64,3 @@ INSERT INTO transactions (userId, itemName, price, quantity) VALUES
                                                                    (10, 'Home Speaker System', 499.99, 1),
                                                                    (10, 'Audio Receiver', 149.99, 1),
                                                                    (10, 'Extension Cord', 14.99, 3);
-
-INSERT INTO userElevations (userId, totalSpent, lastChecked) VALUES
-                                                                     (1, 1595.47, NOW()),
-                                                                     (2, 1097.95, NOW()),
-                                                                     (3, 949.96, NOW()),
-                                                                     (4, 225.97, NOW()),
-                                                                     (5, 765.96, NOW()),
-                                                                     (6, 149.94, NOW()),
-                                                                     (7, 132.88, NOW()),
-                                                                     (8, 509.94, NOW()),
-                                                                     (9, 309.96, NOW()),
-                                                                     (10, 694.95, NOW());

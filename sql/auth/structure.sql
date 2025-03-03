@@ -14,13 +14,13 @@ CREATE TABLE authTokens (
                              userId INT NOT NULL,
                              token TEXT NOT NULL UNIQUE,
                              createdAt TIMESTAMP DEFAULT NOW(),
-                             expiresAt TIMESTAMP NOT NULL,
                              FOREIGN KEY (userid) REFERENCES userProfiles(id) ON DELETE CASCADE
 );
 
 CREATE TABLE userWallets (
                               userId INT PRIMARY KEY,
                               balance NUMERIC(10,2) DEFAULT 0 CHECK (balance >= 0),
+                              totalSpent NUMERIC(10,2) DEFAULT 0,
                               FOREIGN KEY (userId) REFERENCES userProfiles(id) ON DELETE CASCADE
 );
 
@@ -33,11 +33,4 @@ CREATE TABLE transactions (
                               totalPrice NUMERIC(10,2) GENERATED ALWAYS AS (price * quantity) STORED,
                               createdAt TIMESTAMP DEFAULT NOW(),
                               FOREIGN KEY (userId) REFERENCES userProfiles(id) ON DELETE CASCADE
-);
-
-CREATE TABLE userElevations (
-                                 userId INT PRIMARY KEY,
-                                 totalSpent NUMERIC(10,2) DEFAULT 0,
-                                 lastChecked TIMESTAMP DEFAULT NOW(),
-                                 FOREIGN KEY (userId) REFERENCES userProfiles(id) ON DELETE CASCADE
 );
