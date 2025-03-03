@@ -3,14 +3,14 @@
 namespace Models\Domain\Brokers;
 
 use Zephyrus\Database\DatabaseBroker;
-use Models\Domain\Entities\Token;
+use Models\Domain\Entities\UserToken;
 
-class TokenBroker extends DatabaseBroker
+class UserTokenBroker extends DatabaseBroker
 {
-    public function save(Token $token): int
+    public function save(UserToken $token): int
     {
         $this->selectSingle("
-            INSERT INTO authTokens (userId, token) 
+            INSERT INTO userToken (userId, token) 
             VALUES (?, ?)", [
                 $token->userId,
                 $token->token
@@ -20,11 +20,11 @@ class TokenBroker extends DatabaseBroker
         return (int) $this->getDatabase()->getLastInsertedId("authTokens_id_seq");
     }
 
-    public function findValidTokenByValue(string $tokenValue): ?Token
+    public function findValidTokenByValue(string $tokenValue): ?UserToken
     {
         $row = $this->selectSingle("
         SELECT id, userId, token, createdAt
-        FROM authTokens
+        FROM userToken
         WHERE token = ?
         LIMIT 1",
             [$tokenValue]
@@ -34,7 +34,7 @@ class TokenBroker extends DatabaseBroker
             return null;
         }
 
-        return Token::mapToToken($row);
+        return UserToken::mapToToken($row);
     }
 
     public function revokeToken(string $tokenValue): bool
@@ -45,7 +45,7 @@ class TokenBroker extends DatabaseBroker
             return false;
         }
 
-        $this->selectSingle("DELETE FROM authTokens WHERE token = ?", [$tokenValue]);
+        $this->selectSingle("DELETE FROM userToken WHERE token = ?", [$tokenValue]);
 
         return true;
     }

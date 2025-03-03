@@ -3,7 +3,7 @@
 namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\UserProfileBroker;
-use Models\Domain\Brokers\TokenBroker;
+use Models\Domain\Brokers\userTokenBroker;
 use Models\Domain\Validators\UserProfileValidator;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
@@ -12,12 +12,12 @@ use Zephyrus\Security\Cryptography;
 class UserProfileService
 {
     private UserProfileBroker $userProfileBroker;
-    private TokenBroker $tokenBroker;
+    private userTokenBroker $tokenBroker;
 
     public function __construct()
     {
         $this->userProfileBroker = new UserProfileBroker();
-        $this->tokenBroker = new TokenBroker();
+        $this->tokenBroker = new userTokenBroker();
     }
 
     public function authenticateUser(Form $form): array

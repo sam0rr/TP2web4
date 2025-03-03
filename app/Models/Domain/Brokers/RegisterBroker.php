@@ -10,7 +10,7 @@ class RegisterBroker extends DatabaseBroker
     public function registerUser(UserProfile $user): UserProfile
     {
         $this->rawQuery("
-        INSERT INTO userProfiles (username, firstname, lastname, email, password, type) 
+        INSERT INTO userProfile (username, firstname, lastname, email, password, type) 
         VALUES (?, ?, ?, ?, ?, 'NORMAL')", [
                 $user->username,
                 $user->firstname,
@@ -27,12 +27,12 @@ class RegisterBroker extends DatabaseBroker
 
     public function usernameExists(string $username): bool
     {
-        return (bool) $this->selectSingle("SELECT 1 FROM userProfiles WHERE username = ?", [$username]);
+        return (bool) $this->selectSingle("SELECT 1 FROM userProfile WHERE username = ?", [$username]);
     }
 
     public function emailExists(string $email): bool
     {
-        return (bool) $this->selectSingle("SELECT 1 FROM userProfiles WHERE email = ?", [$email]);
+        return (bool) $this->selectSingle("SELECT 1 FROM userProfile WHERE email = ?", [$email]);
     }
 
 }

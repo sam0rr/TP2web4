@@ -3,8 +3,8 @@
 namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\RegisterBroker;
-use Models\Domain\Brokers\TokenBroker;
-use Models\Domain\Entities\Token;
+use Models\Domain\Brokers\userTokenBroker;
+use Models\Domain\Entities\UserToken;
 use Models\Domain\Entities\UserProfile;
 use Models\Domain\Validators\RegisterValidator;
 use Models\Exceptions\FormException;
@@ -14,12 +14,12 @@ use Zephyrus\Security\Cryptography;
 class RegisterService
 {
     private RegisterBroker $broker;
-    private TokenBroker $tokenBroker;
+    private UserTokenBroker $userTokenBroker;
 
     public function __construct()
     {
         $this->broker = new RegisterBroker();
-        $this->tokenBroker = new TokenBroker();
+        $this->userTokenBroker = new UserTokenBroker();
     }
 
     public function registerUser(Form $form): array
@@ -68,17 +68,17 @@ class RegisterService
         ];
     }
 
-    private function createToken(UserProfile $user): Token
+    private function createToken(UserProfile $user): UserToken
     {
         $tokenValue = "jwt_{$user->username}_" . bin2hex(random_bytes(16));
 
-        $token = new Token();
-        $token->userId = $user->id;
-        $token->token = $tokenValue;
-        $token->createdAt = (new \DateTime())->format("Y-m-d H:i:s");
+        $userToken = new UserToken();
+        $userToken->userId = $user->id;
+        $userToken->token = $tokenValue;
+        $userToken->createdAt = (new \DateTime())->format("Y-m-d H:i:s");
 
-        $token->id = $this->tokenBroker->save($token);
+        $userToken->id = $this->userTokenBroker->save($userToken);
 
-        return $token;
+        return $userToken;
     }
 }

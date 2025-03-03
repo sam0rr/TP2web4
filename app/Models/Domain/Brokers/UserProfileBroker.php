@@ -27,7 +27,7 @@ class UserProfileBroker extends DatabaseBroker
 
         $this->rawQuery($sql, $values);
 
-        $row = $this->selectSingle("SELECT * FROM userProfiles WHERE id = ?", [$userId]);
+        $row = $this->selectSingle("SELECT * FROM userProfile WHERE id = ?", [$userId]);
 
         return $row ? UserProfile::mapToUserProfile($row) : null;
     }
@@ -36,7 +36,7 @@ class UserProfileBroker extends DatabaseBroker
     {
         $row = $this->selectSingle(
             "SELECT id, username, firstname, lastname, email, password, type 
-        FROM userProfiles 
+        FROM userProfile
         WHERE id = ?",
             [$userId]
         );
@@ -48,7 +48,7 @@ class UserProfileBroker extends DatabaseBroker
     {
         $row = $this->selectSingle(
             "SELECT id, username, firstname, lastname, email, password, type 
-            FROM userProfiles 
+            FROM userProfile 
             WHERE username = ?",
             [$username]
         );

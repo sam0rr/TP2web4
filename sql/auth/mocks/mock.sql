@@ -1,4 +1,4 @@
-INSERT INTO userProfiles (username, firstname, lastname, email, password, type) VALUES
+INSERT INTO userProfile (username, firstname, lastname, email, password, type) VALUES
                                                                                                 ('john_doe92', 'Johnathan', 'Doe', 'john.doe92@example.com', '$2y$12$Q2VkaW5nUmVhbGx5U3Ryb25nIQM5z7KjX9kL2mP8vN4rT6uW9yA2C', 'NORMAL'),
                                                                                                 ('jane_smith88', 'Jane', 'Smithson', 'jane.smith88@example.com', '$2y$12$U2VjdXJlUGFzc3dvcmQyMDIyISM8nPxKjL2vR5tY9zA3qW6uB9cE', 'PREMIUM'),
                                                                                                 ('alice_wonder77', 'Alicia', 'Wonderland', 'alice.wonder77@example.com', '$2y$12$V29uZGVyZnVsQWxpY2UyMyEAs7KjX9mP2vN5rT8uW0yB3cF6gJ9', 'NORMAL'),
@@ -10,7 +10,7 @@ INSERT INTO userProfiles (username, firstname, lastname, email, password, type) 
                                                                                                 ('david_lee10', 'David', 'Leeman', 'david.lee10@example.com', '$2y$12$RGF2aWRFbmNyeXB0MjAyMyEHs9KjX2mP5vR8tY0zN3qW6cA9gJ', 'NORMAL'),
                                                                                                 ('linda_kim99', 'Linda', 'Kimberly', 'linda.kim99@example.com', '$2y$12$TGlubmFTZWN1cmUyMDI0IQMz6KjL9vR2tY5zA8qN0uW3cF6gB', 'PREMIUM');
 
-INSERT INTO authTokens (userId, token) VALUES
+INSERT INTO userToken (userId, token) VALUES
                                                          (1, 'jwt_john_doe92_8f3k9p2m7v4r1t6'),
                                                          (2, 'jwt_jane_smith88_5x8y1a4c7e9g2'),
                                                          (3, 'jwt_alice_wonder77_2j5k8m3p6r9t'),
@@ -22,7 +22,7 @@ INSERT INTO authTokens (userId, token) VALUES
                                                          (9, 'jwt_david_lee10_5y8a1c4e7g9j'),
                                                          (10, 'jwt_linda_kim99_2k5m8p3r6t9v');
 
-INSERT INTO userWallets (userId, balance, totalspent) VALUES
+INSERT INTO userWallet (userId, balance, totalspent) VALUES
                                                 (1, 150.75, 1000),
                                                 (2, 750.00, 1000),
                                                 (3, 320.50, 2300),
@@ -34,7 +34,7 @@ INSERT INTO userWallets (userId, balance, totalspent) VALUES
                                                 (9, 275.30, 50),
                                                 (10, 990.15, 2003);
 
-INSERT INTO transactions (userId, itemName, price, quantity) VALUES
+INSERT INTO transaction (userId, itemName, price, quantity) VALUES
                                                                    (1, 'Gaming Laptop', 1499.99, 1),
                                                                    (1, 'Wireless Mouse', 29.99, 2),
                                                                    (1, 'USB-C Hub', 45.50, 1),
