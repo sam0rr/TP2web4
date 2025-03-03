@@ -4,6 +4,7 @@ namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\TransactionBroker;
 use Models\Domain\Brokers\UserTokenBroker;
+use Models\Domain\Brokers\UserWalletBroker;
 use Models\Domain\Entities\Transaction;
 use Models\Domain\Validators\TransactionValidator;
 use Models\Exceptions\FormException;
@@ -12,11 +13,13 @@ use Zephyrus\Application\Form;
 class TransactionService
 {
     private TransactionBroker $transactionBroker;
+    private UserWalletBroker $walletBroker;
     private UserTokenBroker $tokenBroker;
 
     public function __construct()
     {
         $this->transactionBroker = new TransactionBroker();
+        $this->walletBroker = new UserWalletBroker();
         $this->tokenBroker = new UserTokenBroker();
     }
 
@@ -49,6 +52,9 @@ class TransactionService
         if (!$savedTransaction) {
             return ["errors" => ["Erreur lors de l'ajout de la transaction"], "status" => 500];
         }
+
+        $this->walletBroker->updateTotalSpent($transaction->userId, $transaction->totalPrice);
+
 
         return [
             "message" => "Transaction ajoutée avec succès",

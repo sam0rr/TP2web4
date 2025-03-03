@@ -46,6 +46,18 @@ class UserWalletBroker extends DatabaseBroker
         return $this->findByUserId($userId);
     }
 
+    public function updateTotalSpent(int $userId, float $amount): ?UserWallet
+    {
+        $this->query("
+        UPDATE userWallet 
+        SET totalSpent = totalSpent + ? 
+        WHERE userId = ?",
+            [$amount, $userId]
+        );
+
+        return $this->findByUserId($userId);
+    }
+
     public function findByUserId(int $userId): ?UserWallet
     {
         $row = $this->selectSingle("

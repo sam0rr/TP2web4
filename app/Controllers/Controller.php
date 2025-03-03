@@ -28,7 +28,7 @@ abstract class Controller extends BaseController
         $this->authenticatedUserToken = $this->tokenService->validateToken($this->originalToken);
 
         if (!$this->authenticatedUserToken) {
-            return $this->abortUnauthorized("Token ou méthode HTTP invalide.");
+            return $this->abortUnauthorized("Token invalide.");
         }
 
         return parent::before();
