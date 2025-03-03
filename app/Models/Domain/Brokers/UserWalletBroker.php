@@ -35,6 +35,18 @@ class UserWalletBroker extends DatabaseBroker
         return $this->findByUserId($userId);
     }
 
+    public function withdrawFunds(int $userId, float $amount): UserWallet
+    {
+        $this->selectSingle("
+            UPDATE userWallet
+            SET balance = balance - ?
+            WHERE userId = ?",
+            [$amount, $userId]
+        );
+
+        return $this->findByUserId($userId);
+    }
+
     public function findByUserId(int $userId): ?UserWallet
     {
         $row = $this->selectSingle("

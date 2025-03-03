@@ -51,7 +51,6 @@ class UserWalletService
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
 
-
         try {
             UserWalletValidator::assertCreditAmount($user->type, $form);
         } catch (FormException $e) {
@@ -66,6 +65,36 @@ class UserWalletService
 
         return [
             "message" => "Crédits ajoutés avec succès.",
+            "balance" => $updatedWallet->balance,
+            "status" => 200
+        ];
+    }
+
+    public function withdrawCredits(string $token, float $amount, Form $form): array
+    {
+        $tokenData = $this->tokenBroker->findValidTokenByValue($token);
+
+        $user = $this->profileBroker->findById($tokenData->userId);
+
+        if (!$user) {
+            return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
+        }
+
+        $wallet = $this->walletBroker->findOrCreateWallet($user->id);
+
+        try {
+            UserWalletValidator::assertWithdrawAmount($form, $amount, $wallet->balance);
+        } catch (FormException $e) {
+            return [
+                "errors" => array_values($e->getForm()->getErrorMessages()),
+                "status" => 400
+            ];
+        }
+
+        $updatedWallet = $this->walletBroker->withdrawFunds($wallet->userId, $amount);
+
+        return [
+            "message" => "Retrait effectué avec succès.",
             "balance" => $updatedWallet->balance,
             "status" => 200
         ];

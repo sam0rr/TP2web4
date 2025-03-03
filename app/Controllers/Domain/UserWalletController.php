@@ -13,9 +13,6 @@ class UserWalletController extends Controller
 {
     private UserWalletService $userWalletService;
 
-    // #[Post("/profile/{token}/credits")]     // Ajouter des fonds au portefeuille
-    ////#[Post("/profile/{token}/withdraw")]    // Retirer de l’argent du portefeuille
-
     public function __construct()
     {
         $this->userWalletService = new UserWalletService();
@@ -52,6 +49,27 @@ class UserWalletController extends Controller
 
         return $this->json($result);
     }
+
+    #[Post("/profile/{token}/withdraw")]
+    public function withdrawCredits(string $token): Response
+    {
+        $data = $this->request->getBody()->getParameters();
+
+        if (empty($data)) {
+            return $this->abortBadRequest("Aucune donnée envoyée ou format incorrect.");
+        }
+
+        $withdrawAmount = floatval($data['credit']);
+        $form = new Form($data);
+        $result = $this->userWalletService->withdrawCredits($token, $withdrawAmount, $form);
+
+        if (isset($result["errors"])) {
+            return $this->json($result);
+        }
+
+        return $this->json($result);
+    }
+
 
 }
 

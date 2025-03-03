@@ -33,4 +33,25 @@ class UserWalletValidator
             throw new FormException($form);
         }
     }
+
+    public static function assertWithdrawAmount(Form $form, float $amount, float $balance): void
+    {
+        $form->field("credit", [
+            Rule::required("Le montant du retrait est obligatoire."),
+            Rule::decimal("Le montant doit être un nombre valide."),
+            Rule::greaterThan(0, "Le montant doit être supérieur à 0.")
+        ]);
+
+        if (!$form->verify()) {
+            throw new FormException($form);
+        }
+
+        if ($amount > $balance) {
+            $form->addError("credit", "Fonds insuffisants.");
+        }
+
+        if ($form->hasError()) {
+            throw new FormException($form);
+        }
+    }
 }
