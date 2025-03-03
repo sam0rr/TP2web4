@@ -17,7 +17,7 @@ class UserTokenBroker extends DatabaseBroker
             ]
         );
 
-        return (int) $this->getDatabase()->getLastInsertedId("authTokens_id_seq");
+        return (int) $this->getDatabase()->getLastInsertedId("usertoken_id_seq");
     }
 
     public function findValidTokenByValue(string $tokenValue): ?UserToken
@@ -35,6 +35,20 @@ class UserTokenBroker extends DatabaseBroker
         }
 
         return UserToken::mapToToken($row);
+    }
+
+    public function findValidTokenByUserId(int $userId): ?userToken
+    {
+        $row = $this->selectSingle("
+        SELECT id, userId, token, createdAt
+        FROM userToken
+        WHERE userId = ?
+        ORDER BY createdAt DESC
+        LIMIT 1",
+            [$userId]
+        );
+
+        return $row ? userToken::mapToToken($row) : null;
     }
 
     public function revokeToken(string $tokenValue): bool

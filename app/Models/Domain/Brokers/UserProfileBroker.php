@@ -23,7 +23,7 @@ class UserProfileBroker extends DatabaseBroker
 
         $values[] = $userId;
 
-        $sql = "UPDATE userProfiles SET " . implode(", ", $setClauses) . " WHERE id = ?";
+        $sql = "UPDATE userProfile SET " . implode(", ", $setClauses) . " WHERE id = ?";
 
         $this->rawQuery($sql, $values);
 

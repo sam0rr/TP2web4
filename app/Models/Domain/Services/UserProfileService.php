@@ -44,8 +44,11 @@ class UserProfileService
             return ["errors" => ["Mot de passe incorrect."], "status" => 401];
         }
 
+        $tokenData = $this->tokenBroker->findValidTokenByUserId($user->id);
+
         return [
-            "message" => "Connexion réussie"
+            "message" => "Connexion réussie",
+            "userToken" => $tokenData->token
         ];
     }
 
@@ -53,11 +56,15 @@ class UserProfileService
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
 
+        if (!$tokenData) {
+            return ["errors" => ["Token invalide ou expiré"], "status" => 401];
+        }
+
         $userId = $tokenData->userId;
 
-        $data = array_filter($form->getFields(), function ($value) {
-            return !is_null($value) && $value !== "";
-        });
+        $data = array_filter($form->getFields(), function ($value, $key) {
+            return !is_null($value) && $value !== "" && $key !== "password";
+        }, ARRAY_FILTER_USE_BOTH);
 
         if (empty($data)) {
             return ["errors" => ["Aucune donnée à mettre à jour"], "status" => 400];
@@ -70,6 +77,10 @@ class UserProfileService
                 "errors" => array_values($e->getForm()->getErrorMessages()),
                 "status" => 400
             ];
+        }
+
+        if (isset($data['password'])) {
+            unset($data['password']);
         }
 
         $updatedUser = $this->userProfileBroker->updateUserProfile($userId, $data);
@@ -91,7 +102,6 @@ class UserProfileService
             "status" => 200
         ];
     }
-
 
     public function getUserProfile(string $token): array
     {

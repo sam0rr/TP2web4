@@ -20,7 +20,7 @@ class RegisterBroker extends DatabaseBroker
             ]
         );
 
-        $user->id = (int) $this->getDatabase()->getLastInsertedId("userprofiles_id_seq");
+        $user->id = (int) $this->getDatabase()->getLastInsertedId("userprofile_id_seq");
 
         return $user;
     }
