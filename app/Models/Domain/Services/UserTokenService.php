@@ -66,7 +66,6 @@ class UserTokenService
         }
 
         $tokenValue = "jwt_" . uniqid(bin2hex(random_bytes(16)), true);
-
         $userToken = new UserToken();
         $userToken->userId = $userId;
         $userToken->token = $tokenValue;
