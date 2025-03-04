@@ -46,7 +46,7 @@ class RegisterService
 
         return [
             "message" => "User enregistré avec succès",
-            "token" => $token->token,
+            "T O K E N" => $token->token,
             "user" => [
                 "id" => $user->id,
                 "username" => $user->username,

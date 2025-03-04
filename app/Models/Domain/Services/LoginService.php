@@ -50,7 +50,7 @@ class LoginService
 
         return [
             "message" => "Connexion réussie",
-            "userToken" => $newToken->token
+            "T O K E N" => $newToken->token
         ];
     }
 

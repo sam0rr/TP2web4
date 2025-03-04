@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Zephyrus\Application\Controller as BaseController;
+use Zephyrus\Network\ContentType;
 use Zephyrus\Network\Response;
 use Models\Domain\Services\UserTokenService;
 use Models\Domain\Entities\UserToken;
@@ -37,9 +38,18 @@ abstract class Controller extends BaseController
     public function after(?Response $response): ?Response
     {
         if ($this->authenticatedUserToken) {
-            $this->tokenService->renewUserTokenByTokenValue($this->originalToken);
+            $newToken = $this->tokenService->renewUserTokenByTokenValue($this->originalToken);
+
+            if ($newToken && $response && $response->getContentType() === ContentType::JSON) {
+                $content = json_decode($response->getContent(), true) ?? [];
+                $content["T O K E N"] = $newToken->token;
+
+                return $this->json($content);
+            }
         }
 
         return parent::after($response);
     }
+
+
 }
