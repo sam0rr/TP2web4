@@ -4,6 +4,7 @@ namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\UserProfileBroker;
 use Models\Domain\Brokers\UserTokenBroker;
+use Models\Domain\Brokers\UserWalletBroker;
 use Models\Domain\Validators\UserProfileValidator;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
@@ -12,11 +13,13 @@ use Zephyrus\Security\Cryptography;
 class UserProfileService
 {
     private UserProfileBroker $userProfileBroker;
+    private UserWalletBroker $userWalletBroker;
     private UserTokenBroker $tokenBroker;
 
     public function __construct()
     {
         $this->userProfileBroker = new UserProfileBroker();
+        $this->userWalletBroker = new UserWalletBroker();
         $this->tokenBroker = new UserTokenBroker();
     }
 
@@ -103,12 +106,12 @@ class UserProfileService
         }
 
         $user = $this->userProfileBroker->findById($userId);
-        if (!$user) {
-            return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
-        }
+        $wallet = $this->userWalletBroker->findByUserId($userId);
 
-        if ($user->type === "PREMIUM") {
-            return ["errors" => ["L'utilisateur est déjà PREMIUM."], "status" => 400];
+        try {
+            UserProfileValidator::assertElevationEligibility($user, $wallet);
+        } catch (FormException $e) {
+            return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
         }
 
         $updatedUser = $this->userProfileBroker->updateAccountType($userId, "PREMIUM");

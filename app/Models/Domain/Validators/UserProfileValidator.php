@@ -2,15 +2,31 @@
 
 namespace Models\Domain\Validators;
 
+use Models\Exceptions\FormException;
+use Models\Domain\Entities\UserProfile;
+use Models\Domain\Entities\UserWallet;
 use Zephyrus\Application\Form;
 use Zephyrus\Application\Rule;
-use Models\Exceptions\FormException;
 
 class UserProfileValidator
 {
+    public static function assertElevationEligibility(Form $form, ?UserProfile $user, ?UserWallet $wallet): void
+    {
+        if (!$user) {
+            $form->addError("user", "Utilisateur non trouvé.");
+        }
+
+        if ($user && $user->type === "PREMIUM") {
+            $form->addError("user", "L'utilisateur est déjà PREMIUM.");
+        }
+
+        if (!$wallet || $wallet->totalSpent < 1000) {
+            $form->addError("wallet", "L'utilisateur doit avoir dépensé au moins 1 000 $ pour être éligible à l'élévation.");
+        }
+    }
+
     public static function assertUpdate(Form $form): void
     {
-
         if (isset($form->getFields()["email"])) {
             $form->field("email", [
                 Rule::required("L'email est obligatoire."),
