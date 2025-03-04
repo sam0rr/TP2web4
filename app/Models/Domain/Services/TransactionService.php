@@ -55,9 +55,10 @@ class TransactionService
         return [
             "message" => "Transaction ajoutée avec succès",
             "transaction" => [
-                "name" => $savedTransaction->itemName,
+                "itemname" => $savedTransaction->itemName,
+                "quantity" => $savedTransaction->quantity,
                 "price" => $savedTransaction->price,
-                "quantity" => $savedTransaction->quantity
+                "totalPrice" => $savedTransaction->totalPrice,
             ],
             "status" => 201
         ];
@@ -73,17 +74,23 @@ class TransactionService
 
         $transactions = $this->transactionBroker->findTransactionsByUserId($tokenData->userId);
 
+        $total = array_reduce($transactions, function ($sum, $transaction) {
+            return $sum + ($transaction->price * $transaction->quantity);
+        }, 0);
+
         $formattedTransactions = array_map(function ($transaction) {
             return [
                 "name" => $transaction->itemName,
                 "price" => $transaction->price,
-                "quantity" => $transaction->quantity
+                "quantity" => $transaction->quantity,
+                "totalPrice" => ($transaction->price * $transaction->quantity)
             ];
         }, $transactions);
-
+        
         return [
             "token" => $token,
-            "transactions" => $formattedTransactions
+            "transactions" => $formattedTransactions,
+            "totalSpent" => $total
         ];
     }
 
@@ -112,7 +119,7 @@ class TransactionService
     {
         $transaction = new Transaction();
         $transaction->userId = $userId;
-        $transaction->itemName = $form->getValue("item_name");
+        $transaction->itemName = $form->getValue("itemname");
         $transaction->price = (float) $form->getValue("price");
         $transaction->quantity = (int) $form->getValue("quantity");
         $transaction->totalPrice = $totalPrice;

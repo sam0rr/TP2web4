@@ -15,8 +15,7 @@ class TransactionBroker extends DatabaseBroker
                 $transaction->userId,
                 $transaction->itemName,
                 $transaction->price,
-                $transaction->quantity,
-                $transaction->totalPrice
+                $transaction->quantity
             ]
         );
 
