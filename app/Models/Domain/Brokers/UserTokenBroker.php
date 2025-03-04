@@ -9,9 +9,8 @@ class UserTokenBroker extends DatabaseBroker
 {
     public function save(UserToken $token): ?UserToken
     {
-        $db = $this->getDatabase();
 
-        if (!is_int($token->userId) || empty($token->token)) {
+        if (empty($token->token)) {
             return null;
         }
 
@@ -22,19 +21,17 @@ class UserTokenBroker extends DatabaseBroker
             $token->token
         ]);
 
-        $token->id = $db->getLastInsertedId("usertoken_id_seq");
-
-        if (!$token->id) {
+        if (!$token->userId) {
             return null;
         }
 
-        return $this->findTokenById($token->id);
+        return $this->findValidTokenByUserId($token->userId);
     }
 
     public function findValidTokenByValue(string $tokenValue): ?UserToken
     {
         $row = $this->selectSingle("
-        SELECT id, userid, token, createdat
+        SELECT userid, token, createdat
         FROM usertoken
         WHERE token = ? 
         LIMIT 1",
@@ -47,7 +44,7 @@ class UserTokenBroker extends DatabaseBroker
     public function findValidTokenByUserId(int $userId): ?UserToken
     {
         $row = $this->selectSingle("
-        SELECT id, userid, token, createdat
+        SELECT userid, token, createdat
         FROM usertoken
         WHERE userid = ?
         ORDER BY createdat DESC
@@ -58,26 +55,13 @@ class UserTokenBroker extends DatabaseBroker
         return $row ? UserToken::mapToToken($row) : null;
     }
 
-    public function findTokenById(int $id): ?UserToken
-    {
-        $row = $this->selectSingle("
-        SELECT id, userid, token, createdat
-        FROM usertoken
-        WHERE id = ?
-        LIMIT 1",
-            [$id]
-        );
-
-        return $row ? UserToken::mapToToken($row) : null;
-    }
-
-    public function revokeToken(int $id): bool
+    public function revokeToken(int $userId): bool
     {
         try {
-            $this->query("DELETE FROM usertoken WHERE id = ?", [$id]);
+            $this->query("DELETE FROM usertoken WHERE userid = ?", [$userId]);
             return true;
         } catch (\Exception $e) {
-            error_log("Failed to revoke token ID $id: " . $e->getMessage());
+            error_log("Failed to revoke token userID $userId: " . $e->getMessage());
             return false;
         }
     }

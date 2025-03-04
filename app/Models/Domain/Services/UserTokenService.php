@@ -30,7 +30,7 @@ class UserTokenService
             return null;
         }
 
-        if (!$this->tokenBroker->revokeToken($tokenData->id)) {
+        if (!$this->tokenBroker->revokeToken($tokenData->userId)) {
             return null;
         }
 
@@ -46,7 +46,7 @@ class UserTokenService
 
         $tokenData = $this->tokenBroker->findValidTokenByUserId($userId);
 
-        if ($tokenData && !$this->tokenBroker->revokeToken($tokenData->id)) {
+        if ($tokenData && !$this->tokenBroker->revokeToken($tokenData->userId)) {
             return null;
         }
 
