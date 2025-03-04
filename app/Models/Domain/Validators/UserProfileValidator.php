@@ -45,11 +45,11 @@ class UserProfileValidator
 
     public static function assertPasswordUpdate(Form $form): void
     {
-        $form->field("oldpassword", [
+        $form->field("old", [
             Rule::required("L'ancien mot de passe est obligatoire.")
         ]);
 
-        $form->field("newpassword", [
+        $form->field("new", [
             Rule::required("Le mot de passe est obligatoire."),
             Rule::minLength(8, "Le mot de passe doit contenir au moins 8 caractères."),
         ]);
@@ -58,8 +58,8 @@ class UserProfileValidator
             throw new FormException($form);
         }
 
-        $oldPassword = $form->getValue("old_password");
-        $newPassword = $form->getValue("new_password");
+        $oldPassword = $form->getValue("old");
+        $newPassword = $form->getValue("new");
 
         if ($oldPassword === $newPassword) {
             $form->addError("new_password", "Le nouveau mot de passe doit être différent de l'ancien.");
