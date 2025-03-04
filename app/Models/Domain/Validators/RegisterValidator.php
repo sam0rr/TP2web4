@@ -29,6 +29,10 @@ class RegisterValidator
             Rule::required("Le nom de famille est obligatoire.")
         ]);
 
+        if (!$form->verify()) {
+            throw new FormException($form);
+        }
+
         if ($broker->usernameExists($form->getValue('username'))) {
             $form->addError("username", "Nom d'utilisateur déjà utilisé.");
         }

@@ -4,7 +4,7 @@ namespace Controllers\Domain;
 
 use Controllers\Controller;
 use Models\Domain\Services\UserProfileService;
-use Zephyrus\Application\Form;
+use Zephyrus\Network\ContentType;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Get;
 use Zephyrus\Network\Router\Put;
@@ -15,70 +15,78 @@ class UserProfileController extends Controller
 
     public function __construct()
     {
-        $this-> userProfileService = new UserProfileService();
+        $this->userProfileService = new UserProfileService();
     }
 
     #[Get("/profile/{token}")]
     public function getProfile(string $token): Response
     {
-        $result = $this->userProfileService->getUserProfile($token);
+        try {
+            $result = $this->userProfileService->getUserProfile($token);
 
-        if (isset($result["errors"])) {
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
+
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de la récupération du profil."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Put("/profile/{token}")]
     public function updateProfile(string $token): Response
     {
-        $data = $this->request->getBody()->getParameters();
+        try {
+            $form = $this->buildForm();
+            $result = $this->userProfileService->updateUserProfile($token, $form);
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée.");
-        }
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
 
-        $form = new Form($data);
-        $result = $this->userProfileService->updateUserProfile($token, $form);
-
-        if (isset($result["errors"])) {
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de l'update du profil de l'usager."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Put("/profile/{token}/password")]
     public function updatePassword(string $token): Response
     {
-        $data = $this->request->getBody()->getParameters();
+        try {
+            $form = $this->buildForm();
+            $result = $this->userProfileService->updatePassword($token, $form);
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée.");
-        }
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
 
-        $form = new Form($data);
-        $result = $this->userProfileService->updatePassword($token, $form);
-
-        if (isset($result["errors"])) {
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de l'update du mot de passe de l'usager."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Put("/profile/{token}/elevate")]
     public function elevateAccount(string $token): Response
     {
-        $form = new Form();
-        $result = $this->userProfileService->elevateAccount($token, $form);
+        try {
+            $form = $this->buildForm();
+            $result = $this->userProfileService->elevateAccount($token, $form);
 
-        if (isset($result["errors"])) {
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
+
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de l'élévation du compte."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
 }

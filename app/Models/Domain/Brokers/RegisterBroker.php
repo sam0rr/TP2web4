@@ -40,7 +40,7 @@ class RegisterBroker extends DatabaseBroker
 
     public function usernameExists(string $username): bool
     {
-        return (bool) $this->selectSingle()("SELECT 1 FROM userProfile WHERE username = ?", [$username]);
+        return (bool) $this->selectSingle("SELECT 1 FROM userProfile WHERE username = ?", [$username]);
     }
 
     public function emailExists(string $email): bool

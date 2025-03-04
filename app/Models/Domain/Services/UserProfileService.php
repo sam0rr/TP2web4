@@ -82,8 +82,8 @@ class UserProfileService
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
 
-        $oldPassword = $form->getValue("old_password");
-        $newPassword = $form->getValue("new_password");
+        $oldPassword = $form->getValue("oldpassword");
+        $newPassword = $form->getValue("newpassword");
 
         if (!Cryptography::verifyHashedPassword($oldPassword, $user->password)) {
             return ["errors" => ["Ancien mot de passe incorrect."], "status" => 400];

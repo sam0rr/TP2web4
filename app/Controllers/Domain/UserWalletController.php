@@ -2,12 +2,12 @@
 
 namespace Controllers\Domain;
 
-    use Controllers\Controller;
-    use Models\Domain\Services\UserWalletService;
-    use Zephyrus\Application\Form;
-    use Zephyrus\Network\Response;
-    use Zephyrus\Network\Router\Post;
-    use Zephyrus\Network\Router\Get;
+use Controllers\Controller;
+use Models\Domain\Services\UserWalletService;
+use Zephyrus\Network\ContentType;
+use Zephyrus\Network\Response;
+use Zephyrus\Network\Router\Post;
+use Zephyrus\Network\Router\Get;
 
 class UserWalletController extends Controller
 {
@@ -21,55 +21,56 @@ class UserWalletController extends Controller
     #[Get("/profile/{token}/credits")]
     public function getCredits(string $token): Response
     {
-        $result = $this->userWalletService->getUserCredits($token);
+        try {
+            $result = $this->userWalletService->getUserCredits($token);
 
-        if (isset($result["errors"])) {
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
+
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de la récupération du solde."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Post("/profile/{token}/credits")]
     public function addCredits(string $token): Response
     {
-        $data = $this->request->getBody()->getParameters();
+        try {
+            $form = $this->buildForm();
+            $creditAmount = floatval($form->getValue("credit"));
+            $result = $this->userWalletService->addCredits($token, $creditAmount, $form);
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée ou format incorrect.");
-        }
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
 
-        $creditAmount = floatval($data['credit']);
-        $form = new Form($data);
-        $result = $this->userWalletService->addCredits($token, $creditAmount , $form);
-
-        if (isset($result["errors"])) {
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de l'ajout de crédit."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Post("/profile/{token}/withdraw")]
     public function withdrawCredits(string $token): Response
     {
-        $data = $this->request->getBody()->getParameters();
+        try {
+            $form = $this->buildForm();
+            $withdrawAmount = floatval($form->getValue("credit"));
+            $result = $this->userWalletService->withdrawCredits($token, $withdrawAmount, $form);
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée ou format incorrect.");
-        }
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
 
-        $withdrawAmount = floatval($data['credit']);
-        $form = new Form($data);
-        $result = $this->userWalletService->withdrawCredits($token, $withdrawAmount, $form);
-
-        if (isset($result["errors"])) {
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors du retrait de crédits."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
-
 }
-

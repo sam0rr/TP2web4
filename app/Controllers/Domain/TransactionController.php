@@ -4,10 +4,10 @@ namespace Controllers\Domain;
 
 use Controllers\Controller;
 use Models\Domain\Services\TransactionService;
+use Zephyrus\Network\ContentType;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Post;
 use Zephyrus\Network\Router\Get;
-use Zephyrus\Application\Form;
 
 class TransactionController extends Controller
 {
@@ -21,27 +21,36 @@ class TransactionController extends Controller
     #[Post("/profile/{token}/transactions")]
     public function addTransaction(string $token): Response
     {
-        $data = $this->request->getBody()->getParameters();
+        try {
+            $form = $this->buildForm();
+            $result = $this->transactionService->addTransaction($token, $form);
 
-        if (empty($data)) {
-            return $this->abortBadRequest("Aucune donnée envoyée.");
-        }
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
 
-        $form = new Form($data);
-        $result = $this->transactionService->addTransaction($token, $form);
-
-        if (isset($result["errors"])) {
             return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de la création de la transaction."]), ContentType::JSON);
         }
-
-        return $this->json($result);
     }
 
     #[Get("/profile/{token}/history")]
     public function getTransactionHistory(string $token): Response
     {
-        $transactions = $this->transactionService->getUserTransactions($token);
+        try {
+            $result = $this->transactionService->getUserTransactions($token);
 
-        return $this->json($transactions);
+            if (isset($result["errors"])) {
+                return $this->abortBadRequest(json_encode(["errors" => $result["errors"]]), ContentType::JSON);
+            }
+
+            return $this->json($result);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return $this->abortBadRequest(json_encode(["error" => "Une erreur s'est produite lors de la récupération de l'historique des transactions."]), ContentType::JSON);
+        }
     }
+
 }

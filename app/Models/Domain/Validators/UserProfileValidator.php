@@ -23,6 +23,10 @@ class UserProfileValidator
         if (!$wallet || $wallet->totalSpent < 1000) {
             $form->addError("wallet", "L'utilisateur doit avoir dépensé au moins 1 000 $ pour être éligible à l'élévation.");
         }
+
+        if (!$form->verify()) {
+            throw new FormException($form);
+        }
     }
 
     public static function assertUpdate(Form $form): void
@@ -41,11 +45,11 @@ class UserProfileValidator
 
     public static function assertPasswordUpdate(Form $form): void
     {
-        $form->field("old_password", [
+        $form->field("oldpassword", [
             Rule::required("L'ancien mot de passe est obligatoire.")
         ]);
 
-        $form->field("new_password", [
+        $form->field("newpassword", [
             Rule::required("Le mot de passe est obligatoire."),
             Rule::minLength(8, "Le mot de passe doit contenir au moins 8 caractères."),
         ]);
