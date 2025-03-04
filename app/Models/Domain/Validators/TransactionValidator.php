@@ -10,7 +10,7 @@ class TransactionValidator
 {
     public static function assertTransaction(Form $form, string $userType): void
     {
-        $form->field("itemname", [
+        $form->field("name", [
             Rule::required("Le nom de l'article est obligatoire."),
             Rule::maxLength(255, "Le nom de l'article ne peut pas dépasser 255 caractères.")
         ]);

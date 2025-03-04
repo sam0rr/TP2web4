@@ -55,7 +55,7 @@ class TransactionService
         return [
             "message" => "Transaction ajoutée avec succès",
             "transaction" => [
-                "itemname" => $savedTransaction->itemName,
+                "name" => $savedTransaction->itemName,
                 "quantity" => $savedTransaction->quantity,
                 "price" => $savedTransaction->price,
                 "totalPrice" => $savedTransaction->totalPrice,
@@ -119,7 +119,7 @@ class TransactionService
     {
         $transaction = new Transaction();
         $transaction->userId = $userId;
-        $transaction->itemName = $form->getValue("itemname");
+        $transaction->itemName = $form->getValue("name");
         $transaction->price = (float) $form->getValue("price");
         $transaction->quantity = (int) $form->getValue("quantity");
         $transaction->totalPrice = $totalPrice;

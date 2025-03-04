@@ -36,7 +36,9 @@ abstract class Controller extends BaseController
 
     public function after(?Response $response): ?Response
     {
-
+        if ($this->authenticatedUserToken) {
+            $this->tokenService->renewUserTokenByTokenValue($this->originalToken);
+        }
 
         return parent::after($response);
     }

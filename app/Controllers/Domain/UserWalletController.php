@@ -8,6 +8,7 @@ use Zephyrus\Network\ContentType;
 use Zephyrus\Network\Response;
 use Zephyrus\Network\Router\Post;
 use Zephyrus\Network\Router\Get;
+use Zephyrus\Network\Router\Put;
 
 class UserWalletController extends Controller
 {
@@ -54,7 +55,7 @@ class UserWalletController extends Controller
         }
     }
 
-    #[Post("/profile/{token}/withdraw")]
+    #[Put("/profile/{token}/withdraw")]
     public function withdrawCredits(string $token): Response
     {
         try {
