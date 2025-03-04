@@ -98,7 +98,7 @@ class UserProfileService
         return ["message" => "Mot de passe mis à jour avec succès", "status" => 200];
     }
 
-    public function elevateAccount(string $token): array
+    public function elevateAccount(string $token, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
         if (!$userId) {
@@ -109,7 +109,7 @@ class UserProfileService
         $wallet = $this->userWalletBroker->findByUserId($userId);
 
         try {
-            UserProfileValidator::assertElevationEligibility($user, $wallet);
+            UserProfileValidator::assertElevationEligibility($user, $wallet, $form);
         } catch (FormException $e) {
             return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
         }

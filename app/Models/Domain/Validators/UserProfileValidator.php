@@ -10,7 +10,7 @@ use Zephyrus\Application\Rule;
 
 class UserProfileValidator
 {
-    public static function assertElevationEligibility(Form $form, ?UserProfile $user, ?UserWallet $wallet): void
+    public static function assertElevationEligibility(?UserProfile $user, ?UserWallet $wallet, Form $form, ): void
     {
         if (!$user) {
             $form->addError("user", "Utilisateur non trouvé.");

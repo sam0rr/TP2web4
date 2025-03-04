@@ -71,7 +71,8 @@ class UserProfileController extends Controller
     #[Put("/profile/{token}/elevate")]
     public function elevateAccount(string $token): Response
     {
-        $result = $this->userProfileService->elevateAccount($token);
+        $form = new Form();
+        $result = $this->userProfileService->elevateAccount($token, $form);
 
         if (isset($result["errors"])) {
             return $this->json($result);
