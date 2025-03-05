@@ -9,9 +9,9 @@ class RegisterBroker extends DatabaseBroker
 {
     public function registerUser(UserProfile $user): ?UserProfile
     {
-        $this->query("
-            INSERT INTO userProfile (username, firstname, lastname, email, password, type) 
-            VALUES (?, ?, ?, ?, ?, 'NORMAL')", [
+        $row = $this->query("
+        INSERT INTO userProfile (username, firstname, lastname, email, password, type) 
+        VALUES (?, ?, ?, ?, ?, 'NORMAL') RETURNING id", [
                 $user->username,
                 $user->firstname,
                 $user->lastname,
@@ -20,22 +20,34 @@ class RegisterBroker extends DatabaseBroker
             ]
         );
 
-        $user->id = (int) $this->getDatabase()->getLastInsertedId("userProfile_id_seq");
-
-        if (!$user->id) {
+        if (!$row || !isset($row['id'])) {
             return null;
         }
 
+        $user->id = $row['id'];
+
         try {
             $this->query("
-                INSERT INTO userWallet (userId, balance, totalSpent) 
-                VALUES (?, 0, 0)", [$user->id]
+            INSERT INTO userWallet (userId, balance, totalSpent) 
+            VALUES (?, 0, 0)", [$user->id]
             );
         } catch (\Exception) {
             return null;
         }
 
-        return $user;
+        return $this->findUserById($user->id);
+    }
+
+    public function findUserById(int $id): ?UserProfile
+    {
+        $row = $this->selectSingle("
+        SELECT id, username, firstname, lastname, email, password, type
+        FROM userProfile
+        WHERE id = ?",
+            [$id]
+        );
+
+        return $row ? UserProfile::mapToUserProfile($row) : null;
     }
 
     public function usernameExists(string $username): bool

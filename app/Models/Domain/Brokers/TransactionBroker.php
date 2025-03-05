@@ -9,9 +9,9 @@ class TransactionBroker extends DatabaseBroker
 {
     public function save(Transaction $transaction): ?Transaction
     {
-        $this->query("
-            INSERT INTO transaction (userid, itemname, price, quantity) 
-            VALUES (?, ?, ?, ?)", [
+        $row = $this->selectSingle("
+        INSERT INTO transaction (userId, itemName, price, quantity) 
+        VALUES (?, ?, ?, ?) RETURNING id", [
                 $transaction->userId,
                 $transaction->itemName,
                 $transaction->price,
@@ -19,7 +19,11 @@ class TransactionBroker extends DatabaseBroker
             ]
         );
 
-        $transaction->id = (int) $this->getDatabase()->getLastInsertedId("transaction_id_seq");
+        if (!$row || !isset($row['id'])) {
+            return null;
+        }
+
+        $transaction->id = $row['id'];
 
         return $this->findTransactionById($transaction->id);
     }
@@ -34,7 +38,7 @@ class TransactionBroker extends DatabaseBroker
             [$userId]
         );
 
-        return array_map(fn($row) => Transaction::mapToTransaction($row), $rows);
+        return array_map(fn($row) => Transaction::mapToTransaction((object) $row), $rows);
     }
 
     public function findTransactionById(int $id): ?Transaction
