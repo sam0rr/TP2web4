@@ -15,7 +15,7 @@ CREATE TABLE userToken
     userId INT PRIMARY KEY,
     token TEXT NOT NULL UNIQUE,
     createdAt TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (userid) REFERENCES userProfile(id) ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES userProfile(id) ON DELETE CASCADE
 );
 
 CREATE TABLE userWallet (
@@ -35,3 +35,7 @@ CREATE TABLE transaction (
     createdAt TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (userId) REFERENCES userProfile(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_userToken_token ON userToken(token);
+CREATE UNIQUE INDEX idx_userProfile_username ON userProfile(username);
+CREATE INDEX idx_transaction_userId ON transaction(userId);

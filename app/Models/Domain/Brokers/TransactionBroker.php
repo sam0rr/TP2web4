@@ -19,11 +19,11 @@ class TransactionBroker extends DatabaseBroker
             ]
         );
 
-        if (!$row || !isset($row['id'])) {
+        if (!$row || !isset($row->id)) {
             return null;
         }
 
-        $transaction->id = $row['id'];
+        $transaction->id = $row->id;
 
         return $this->findTransactionById($transaction->id);
     }

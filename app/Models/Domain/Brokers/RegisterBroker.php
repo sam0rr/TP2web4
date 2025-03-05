@@ -20,11 +20,11 @@ class RegisterBroker extends DatabaseBroker
             ]
         );
 
-        if (!$row || !isset($row['id'])) {
+        if (!$row || !isset($row->id)) {
             return null;
         }
 
-        $user->id = $row['id'];
+        $user->id = $row->id;
 
         try {
             $this->query("
