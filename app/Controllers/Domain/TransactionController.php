@@ -18,7 +18,7 @@ class TransactionController extends Controller
         $this->transactionService = new TransactionService();
     }
 
-    #[Post("/profile/{token}/transactions")]
+    #[Post("/{token}/transactions")]
     public function addTransaction(string $token): Response
     {
         try {
@@ -36,7 +36,7 @@ class TransactionController extends Controller
         }
     }
 
-    #[Get("/profile/{token}/history")]
+    #[Get("/{token}/history")]
     public function getTransactionHistory(string $token): Response
     {
         try {

@@ -7,7 +7,9 @@ use Zephyrus\Network\ContentType;
 use Zephyrus\Network\Response;
 use Models\Domain\Services\UserTokenService;
 use Models\Domain\Entities\UserToken;
+use Zephyrus\Network\Router\Root;
 
+#[Root("/profile")]
 abstract class Controller extends BaseController
 {
     private ?UserTokenService $tokenService = null;

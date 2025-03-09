@@ -18,7 +18,7 @@ class UserProfileController extends Controller
         $this->userProfileService = new UserProfileService();
     }
 
-    #[Get("/profile/{token}")]
+    #[Get("/{token}")]
     public function getProfile(string $token): Response
     {
         try {
@@ -35,7 +35,7 @@ class UserProfileController extends Controller
         }
     }
 
-    #[Put("/profile/{token}")]
+    #[Put("/{token}")]
     public function updateProfile(string $token): Response
     {
         try {
@@ -53,7 +53,7 @@ class UserProfileController extends Controller
         }
     }
 
-    #[Put("/profile/{token}/password")]
+    #[Put("/{token}/password")]
     public function updatePassword(string $token): Response
     {
         try {
@@ -71,7 +71,7 @@ class UserProfileController extends Controller
         }
     }
 
-    #[Put("/profile/{token}/elevate")]
+    #[Put("/{token}/elevate")]
     public function elevateAccount(string $token): Response
     {
         try {

@@ -19,7 +19,7 @@ class UserWalletController extends Controller
         $this->userWalletService = new UserWalletService();
     }
 
-    #[Get("/profile/{token}/credits")]
+    #[Get("/{token}/credits")]
     public function getCredits(string $token): Response
     {
         try {
@@ -36,7 +36,7 @@ class UserWalletController extends Controller
         }
     }
 
-    #[Post("/profile/{token}/credits")]
+    #[Post("/{token}/credits")]
     public function addCredits(string $token): Response
     {
         try {
@@ -55,7 +55,7 @@ class UserWalletController extends Controller
         }
     }
 
-    #[Put("/profile/{token}/withdraw")]
+    #[Put("/{token}/withdraw")]
     public function withdrawCredits(string $token): Response
     {
         try {
