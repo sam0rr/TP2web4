@@ -3,6 +3,7 @@
 namespace Models\Domain\Services;
 
 use Models\Domain\Brokers\RegisterBroker;
+use Models\Domain\Brokers\UserProfileBroker;
 use Models\Domain\Validators\RegisterValidator;
 use Models\Domain\Entities\UserProfile;
 use Models\Exceptions\FormException;
@@ -13,17 +14,19 @@ class RegisterService
 {
     private RegisterBroker $broker;
     private UserTokenService $userTokenService;
+    private UserProfileBroker $userProfileBroker;
 
     public function __construct()
     {
         $this->broker = new RegisterBroker();
         $this->userTokenService = new UserTokenService();
+        $this->userProfileBroker = new UserProfileBroker();
     }
 
     public function registerUser(Form $form): array
     {
         try {
-            RegisterValidator::assertRegister($form, $this->broker);
+            RegisterValidator::assertRegister($form, $this->userProfileBroker);
         } catch (FormException $e) {
             return [
                 "errors" => array_values($e->getForm()->getErrorMessages()),

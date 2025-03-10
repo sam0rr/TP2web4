@@ -49,14 +49,4 @@ class RegisterBroker extends DatabaseBroker
 
         return $row ? UserProfile::mapToUserProfile($row) : null;
     }
-
-    public function usernameExists(string $username): bool
-    {
-        return (bool) $this->selectSingle("SELECT 1 FROM userProfile WHERE username = ?", [$username]);
-    }
-
-    public function emailExists(string $email): bool
-    {
-        return (bool) $this->selectSingle("SELECT 1 FROM userProfile WHERE email = ?", [$email]);
-    }
 }

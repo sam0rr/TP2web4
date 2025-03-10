@@ -2,6 +2,7 @@
 
 namespace Models\Domain\Validators;
 
+use Models\Domain\Brokers\UserProfileBroker;
 use Models\Exceptions\FormException;
 use Models\Domain\Entities\UserProfile;
 use Models\Domain\Entities\UserWallet;
@@ -29,13 +30,24 @@ class UserProfileValidator
         }
     }
 
-    public static function assertUpdate(Form $form): void
+    public static function assertUpdate(Form $form ,UserProfileBroker $broker): void
     {
         if (isset($form->getFields()["email"])) {
             $form->field("email", [
                 Rule::required("L'email est obligatoire."),
                 Rule::email("L'email n'est pas valide.")
             ]);
+        }
+
+        if (!$form->verify()) {
+            throw new FormException($form);
+        }
+
+        if ($broker->usernameExists($form->getValue('username'))) {
+            $form->addError("username", "Nom d'utilisateur déjà utilisé.");
+        }
+        if ($broker->emailExists($form->getValue('email'))) {
+            $form->addError("email", "Email déjà utilisé.");
         }
 
         if (!$form->verify()) {

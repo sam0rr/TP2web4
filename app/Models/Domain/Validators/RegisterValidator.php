@@ -2,14 +2,14 @@
 
 namespace Models\Domain\Validators;
 
-use Models\Domain\Brokers\RegisterBroker;
+use Models\Domain\Brokers\UserProfileBroker;
 use Models\Exceptions\FormException;
 use Zephyrus\Application\Form;
 use Zephyrus\Application\Rule;
 
 class RegisterValidator
 {
-    public static function assertRegister(Form $form, RegisterBroker $broker): void
+    public static function assertRegister(Form $form, UserProfileBroker $broker): void
     {
         $form->field("username", [
             Rule::required("Le nom d'utilisateur est obligatoire.")

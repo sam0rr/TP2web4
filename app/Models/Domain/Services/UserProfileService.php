@@ -39,7 +39,7 @@ class UserProfileService
         }
 
         try {
-            UserProfileValidator::assertUpdate(new Form($data));
+            UserProfileValidator::assertUpdate($form, $this->userProfileBroker);
         } catch (FormException $e) {
             return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
         }
