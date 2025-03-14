@@ -31,9 +31,6 @@ class UserWalletService
     public function getUserCredits(string $token): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $wallet = $this->walletBroker->findOrCreateWallet($userId);
         if (!$wallet) {
@@ -51,9 +48,6 @@ class UserWalletService
     public function addCredits(string $token, float $amount, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $user = $this->profileBroker->findById($userId);
         if (!$user) {
@@ -86,9 +80,6 @@ class UserWalletService
     public function withdrawCredits(string $token, float $amount, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $user = $this->profileBroker->findById($userId);
         if (!$user) {

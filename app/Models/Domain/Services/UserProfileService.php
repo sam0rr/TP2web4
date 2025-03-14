@@ -26,9 +26,6 @@ class UserProfileService
     public function updateUserProfile(string $token, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $data = array_filter($form->getFields(), function ($value, $key) {
             return !is_null($value) && $value !== "" && $key !== "password" && $key !== "type";
@@ -67,9 +64,6 @@ class UserProfileService
     public function updatePassword(string $token, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         try {
             UserProfileValidator::assertPasswordUpdate($form);
@@ -101,9 +95,6 @@ class UserProfileService
     public function elevateAccount(string $token, Form $form): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $user = $this->userProfileBroker->findById($userId);
         $wallet = $this->userWalletBroker->findByUserId($userId);
@@ -132,9 +123,6 @@ class UserProfileService
     public function getUserProfile(string $token): array
     {
         $userId = $this->getUserIdFromToken($token);
-        if (!$userId) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 403];
-        }
 
         $user = $this->userProfileBroker->findById($userId);
         if (!$user) {
