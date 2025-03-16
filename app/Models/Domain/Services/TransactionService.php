@@ -75,7 +75,7 @@ class TransactionService
                 "name" => $transaction->itemName,
                 "price" => $transaction->price,
                 "quantity" => $transaction->quantity,
-                "totalPrice" => ($transaction->price * $transaction->quantity)
+                "totalPrice" => $transaction->totalPrice,
             ];
         }, $transactions);
         

@@ -13,7 +13,7 @@ class UserWalletValidator
     {
         $form->field("credit", [
             Rule::required("Le montant du crédit est obligatoire."),
-            Rule::decimal("Le montant du crédit doit être numérique."),
+            Rule::decimal("Le montant doit être un nombre valide."),
             Rule::greaterThan(0, "Le montant doit être supérieur à 0.")
         ]);
 

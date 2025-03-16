@@ -32,23 +32,21 @@ class UserProfileValidator
 
     public static function assertUpdate(Form $form ,UserProfileBroker $broker): void
     {
-        if (isset($form->getFields()["email"])) {
-            $form->field("email", [
-                Rule::email("L'email n'est pas valide.")
-            ]);
-        }
+        $form->field("email", [
+            Rule::email("L'email n'est pas valide.")
+        ]) ->optional();
 
         if (!$form->verify()) {
             throw new FormException($form);
         }
 
-        if (!empty($username)) {
+        if (isset($form->getFields()["username"])) {
             if ($broker->usernameExists($form->getValue('username'))) {
                 $form->addError("username", "Nom d'utilisateur déjà utilisé.");
             }
         }
 
-        if (!empty($email)) {
+        if (isset($form->getFields()["email"])) {
             if ($broker->emailExists($form->getValue('email'))) {
                 $form->addError("email", "Email déjà utilisé.");
             }
