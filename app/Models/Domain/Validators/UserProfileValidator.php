@@ -34,7 +34,6 @@ class UserProfileValidator
     {
         if (isset($form->getFields()["email"])) {
             $form->field("email", [
-                Rule::required("L'email est obligatoire."),
                 Rule::email("L'email n'est pas valide.")
             ]);
         }
@@ -43,11 +42,16 @@ class UserProfileValidator
             throw new FormException($form);
         }
 
-        if ($broker->usernameExists($form->getValue('username'))) {
-            $form->addError("username", "Nom d'utilisateur déjà utilisé.");
+        if (!empty($username)) {
+            if ($broker->usernameExists($form->getValue('username'))) {
+                $form->addError("username", "Nom d'utilisateur déjà utilisé.");
+            }
         }
-        if ($broker->emailExists($form->getValue('email'))) {
-            $form->addError("email", "Email déjà utilisé.");
+
+        if (!empty($email)) {
+            if ($broker->emailExists($form->getValue('email'))) {
+                $form->addError("email", "Email déjà utilisé.");
+            }
         }
 
         if (!$form->verify()) {
