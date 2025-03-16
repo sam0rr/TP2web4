@@ -36,6 +36,7 @@ class RegisterValidator
         if ($broker->usernameExists($form->getValue('username'))) {
             $form->addError("username", "Nom d'utilisateur déjà utilisé.");
         }
+
         if ($broker->emailExists($form->getValue('email'))) {
             $form->addError("email", "Email déjà utilisé.");
         }

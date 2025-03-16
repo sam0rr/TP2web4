@@ -25,7 +25,7 @@ class UserWalletService
     private function getUserIdFromToken(string $token): ?int
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
-        return $tokenData ? $tokenData->userId : null;
+        return $tokenData?->userId;
     }
 
     public function getUserCredits(string $token): array
@@ -33,9 +33,6 @@ class UserWalletService
         $userId = $this->getUserIdFromToken($token);
 
         $wallet = $this->walletBroker->findOrCreateWallet($userId);
-        if (!$wallet) {
-            return ["errors" => ["Impossible de récupérer le portefeuille"], "status" => 500];
-        }
 
         return [
             "userId" => $wallet->userId,
@@ -54,15 +51,12 @@ class UserWalletService
             return ["errors" => ["Utilisateur non trouvé"], "status" => 404];
         }
 
+        $wallet = $this->walletBroker->findOrCreateWallet($userId);
+
         try {
             UserWalletValidator::assertCreditAmount($user->type, $form);
         } catch (FormException $e) {
             return ["errors" => array_values($e->getForm()->getErrorMessages()), "status" => 400];
-        }
-
-        $wallet = $this->walletBroker->findOrCreateWallet($userId);
-        if (!$wallet) {
-            return ["errors" => ["Échec de l'accès au portefeuille"], "status" => 500];
         }
 
         $updatedWallet = $this->walletBroker->addFunds($wallet->userId, $amount);
@@ -87,9 +81,6 @@ class UserWalletService
         }
 
         $wallet = $this->walletBroker->findOrCreateWallet($userId);
-        if (!$wallet) {
-            return ["errors" => ["Échec de l'accès au portefeuille"], "status" => 500];
-        }
 
         try {
             UserWalletValidator::assertWithdrawAmount($form, $amount, $wallet->balance);

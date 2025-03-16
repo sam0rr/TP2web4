@@ -29,9 +29,6 @@ class TransactionService
     public function addTransaction(string $token, Form $form): array
     {
         $user = $this->getUserFromToken($token);
-        if (isset($user["errors"])) {
-            return $user;
-        }
 
         try {
             TransactionValidator::assertTransaction($form, $user["type"]);
@@ -68,15 +65,10 @@ class TransactionService
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
 
-        if (!$tokenData) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 401];
-        }
-
         $transactions = $this->transactionBroker->findTransactionsByUserId($tokenData->userId);
 
-        $total = array_reduce($transactions, function ($sum, $transaction) {
-            return $sum + ($transaction->price * $transaction->quantity);
-        }, 0);
+        $wallet = $this->walletBroker->findByUserId($tokenData->userId);
+        $total = $wallet->totalSpent;
 
         $formattedTransactions = array_map(function ($transaction) {
             return [
@@ -97,9 +89,6 @@ class TransactionService
     private function getUserFromToken(string $token): array
     {
         $tokenData = $this->tokenBroker->findValidTokenByValue($token);
-        if (!$tokenData) {
-            return ["errors" => ["Token invalide ou expiré"], "status" => 401];
-        }
 
         $userProfile = $this->profileBroker->findById($tokenData->userId);
         if (!$userProfile) {

@@ -69,7 +69,7 @@ class UserTokenService
         $userToken = new UserToken();
         $userToken->userId = $userId;
         $userToken->token = $tokenValue;
-        $userToken->createdAt = (new \DateTime())->format("Y-m-d H:i:s");
+        $userToken->createdAt = new \DateTime()->format("Y-m-d H:i:s");
 
         return $this->tokenBroker->save($userToken);
     }

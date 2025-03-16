@@ -34,12 +34,9 @@ class LoginService
         $password = $form->getValue("password");
 
         $user = $this->loginBroker->findByUsername($username);
-        if (!$user) {
-            return ["errors" => ["Utilisateur incorrect"], "status" => 403];
-        }
 
         if (!$user) {
-            return ["errors" => ["Champs incorrects."], "status" => 401];
+            return ["errors" => ["Utilisateur non trouvé."], "status" => 404];
         }
 
         if (!Cryptography::verifyHashedPassword($password, $user->password)) {
