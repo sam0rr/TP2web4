@@ -53,5 +53,4 @@ abstract class Controller extends BaseController
         return parent::after($response);
     }
 
-
 }
